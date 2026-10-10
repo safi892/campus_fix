@@ -122,52 +122,120 @@
     </div>
 </section>
 
-<!-- About & Architecture Section -->
-<section id="about" class="py-5 bg-light border-top">
-    <div class="container py-3">
-        <div class="row align-items-center g-4">
+<!-- Detailed Features & Operational Lifecycle Section -->
+<section id="capabilities" class="py-5 bg-light border-top">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <h3 class="fw-bold mb-3">Hackathon Architecture Principles</h3>
-                <ul class="list-unstyled vstack gap-3 text-secondary">
-                    <li class="d-flex align-items-start">
-                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
-                        <span><strong>Graceful Fallbacks:</strong> If the AI sentence-transformer model is offline, the app seamlessly falls back to keyword matching without crashing.</span>
-                    </li>
-                    <li class="d-flex align-items-start">
-                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
-                        <span><strong>No Record Loss:</strong> Duplicate clustering never deletes original student reports; every student's tracking reference remains valid.</span>
-                    </li>
-                    <li class="d-flex align-items-start">
-                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
-                        <span><strong>Zero Paid APIs:</strong> 100% self-hosted, local CPU execution, and open-source tooling.</span>
-                    </li>
-                </ul>
+                <div class="pe-lg-3">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+                        <i class="bi bi-check2-circle me-1"></i> Enterprise Capabilities
+                    </span>
+                    <h2 class="fw-bold mb-3">Engineered for Rapid Campus Resolution</h2>
+                    <p class="text-muted mb-4">
+                        CampusFix AI bridges the gap between students, educators, and facilities dispatch teams with purpose-built features that prevent duplicate backlogs and prioritize urgent hazards.
+                    </p>
+
+                    <div class="vstack gap-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 bg-primary-subtle text-primary rounded-circle mt-1 flex-shrink-0">
+                                <i class="bi bi-search fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Live Duplicate Prevention</h6>
+                                <p class="text-muted small mb-0">
+                                    Intelligent typeahead alerts reporters if an identical issue is already reported in their building, connecting voices instead of filing duplicate tickets.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 bg-danger-subtle text-danger rounded-circle mt-1 flex-shrink-0">
+                                <i class="bi bi-shield-exclamation fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Instant Emergency Fast-Path</h6>
+                                <p class="text-muted small mb-0">
+                                    Physical safety hazards like electrical sparking, gas odors, and flooding immediately trigger critical priority flags for same-hour dispatch.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 bg-success-subtle text-success rounded-circle mt-1 flex-shrink-0">
+                                <i class="bi bi-qr-code-scan fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">End-to-End Tracking Receipts</h6>
+                                <p class="text-muted small mb-0">
+                                    Reporters receive a unique alphanumeric reference code and interactive 4-stage stepper, providing transparency without follow-up phone calls.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 bg-warning-subtle text-warning-emphasis rounded-circle mt-1 flex-shrink-0">
+                                <i class="bi bi-graph-up-arrow fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Campus Hotspot Intelligence</h6>
+                                <p class="text-muted small mb-0">
+                                    Building-by-building load charts empower administration to detect systemic infrastructure failures and allocate seasonal maintenance budgets proactively.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <div class="col-lg-6">
-                <div class="p-4 bg-white rounded-3 border architecture-card">
-                    <h5 class="fw-bold mb-2">Milestone Roadmap</h5>
-                    <div class="timeline mt-3">
-                        <div class="d-flex mb-3">
-                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M1</span>
+                <div class="card p-4 p-md-5 rounded-4 border-0 shadow-sm bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">Incident Lifecycle</h5>
+                            <small class="text-muted">From report to verified resolution</small>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold">
+                            <i class="bi bi-shield-check me-1"></i> Human Verified
+                        </span>
+                    </div>
+
+                    <div class="vstack gap-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold">01</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">Core Setup &amp; Landing Page ✓</h6>
-                                <small class="text-muted">Flask setup, responsive templates, health check, and setup guide.</small>
+                                <h6 class="fw-bold mb-1">Unified Multi-User Submission</h6>
+                                <p class="text-muted small mb-0">
+                                    Accessible via web portal and classroom door QR codes. Supports photo uploads, location tagging, and room specificity across student and staff roles.
+                                </p>
                             </div>
                         </div>
-                        <div class="d-flex mb-3">
-                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M2</span>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold">02</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite ✓</h6>
-                                <small class="text-muted">Student complaint form, validation, tracking, and database storage.</small>
+                                <h6 class="fw-bold mb-1">Intelligent Deduplication Deck</h6>
+                                <p class="text-muted small mb-0">
+                                    Correlates new reports with existing open jobs in the same facility. Staff review explainable similarity scores and consolidate work with a single click.
+                                </p>
                             </div>
                         </div>
-                        <div class="d-flex">
-                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M3</span>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold">03</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">AI Duplicate Review &amp; Staff Dashboard ✓</h6>
-                                <small class="text-muted">MiniLM similarity clustering, safety alerts, and staff approval interface.</small>
+                                <h6 class="fw-bold mb-1">Simultaneous Resolution Broadcast</h6>
+                                <p class="text-muted small mb-0">
+                                    When technicians resolve a consolidated repair order, every linked student ticket updates automatically. Zero lost data, zero duplicate technician trips.
+                                </p>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="border-top pt-4 mt-4 text-center">
+                        <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-outline-primary rounded-pill w-100 py-2 fw-semibold">
+                            <i class="bi bi-kanban me-2"></i> Explore Staff Triage Dashboard
+                        </a>
                     </div>
                 </div>
             </div>
