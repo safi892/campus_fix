@@ -81,6 +81,14 @@ class RouteTests(unittest.TestCase):
         self.assertIn(b"Critical Priority", page)
         self.assertIn(b"Safety Hazard", page)
 
+    def test_submit_fire_title_is_critical(self):
+        form = {**VALID_FORM, "title": "fire here",
+                "description": "Small fire reported in the lab."}
+        response = self.client.post("/submit", data=form)
+        page = self.client.get(response.location).data
+        self.assertIn(b"Critical Priority", page)
+        self.assertIn(b"Safety Hazard", page)
+
     def test_submit_invalid_category_rejected(self):
         response = self.client.post("/submit", data={**VALID_FORM, "category": "Hacking"})
         self.assertEqual(response.status_code, 400)
