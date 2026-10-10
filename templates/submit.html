@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Issue - CampusFix AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-2">Report a Campus Issue</h1>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-clock me-1"></i> Takes about 45 seconds
+                </p>
+            </div>
+
+            <!-- Error Alert -->
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Submission Error:</strong> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <!-- Submission Form -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('submit.submit_complaint') }}" id="complaintForm">
+                        
+                        <!-- Campus Building -->
+                        <div class="mb-4">
+                            <label for="building" class="form-label fw-semibold">
+                                Campus Building <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="building" name="building" required>
+                                <option value="" selected disabled>Select a building...</option>
+                                {% for building in buildings %}
+                                <option value="{{ building }}" {% if form_data and form_data.building == building %}selected{% endif %}>
+                                    {{ building }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Room/Location -->
+                        <div class="mb-4">
+                            <label for="room" class="form-label fw-semibold">
+                                Room / Location Detail
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="room" 
+                                name="room" 
+                                placeholder="e.g., Room 204, 2nd Floor Hallway"
+                                value="{% if form_data %}{{ form_data.room }}{% endif %}"
+                                maxlength="100"
+                            >
+                            <div class="form-text">Optional but helps maintenance locate the issue faster</div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block mb-3">
+                                Issue Category <span class="text-danger">*</span>
+                            </label>
+                            <div class="row g-3">
+                                {% for category in categories %}
+                                <div class="col-6 col-md-4">
+                                    <input 
+                                        type="radio" 
+                                        class="btn-check" 
+                                        name="category" 
+                                        id="category-{{ category }}" 
+                                        value="{{ category }}"
+                                        {% if form_data and form_data.category == category %}checked{% endif %}
+                                        required
+                                    >
+                                    <label class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3" for="category-{{ category }}">
+                                        {% if category == "HVAC" %}
+                                            <i class="bi bi-thermometer-half fs-4 mb-2"></i>
+                                        {% elif category == "Electrical" %}
+                                            <i class="bi bi-lightning-charge fs-4 mb-2"></i>
+                                        {% elif category == "Plumbing" %}
+                                            <i class="bi bi-droplet fs-4 mb-2"></i>
+                                        {% elif category == "Furniture" %}
+                                            <i class="bi bi-inbox fs-4 mb-2"></i>
+                                        {% elif category == "Cleanliness" %}
+                                            <i class="bi bi-spray-can fs-4 mb-2"></i>
+                                        {% elif category == "Safety" %}
+                                            <i class="bi bi-exclamation-triangle fs-4 mb-2"></i>
+                                        {% endif %}
+                                        <small class="fw-semibold">{{ category }}</small>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-semibold">
+                                Issue Title <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="title" 
+                                name="title" 
+                                placeholder="Brief summary of the issue"
+                                value="{% if form_data %}{{ form_data.title }}{% endif %}"
+                                minlength="5"
+                                maxlength="150"
+                                required
+                            >
+                            <div class="form-text">5-150 characters</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold">
+                                Detailed Description <span class="text-danger">*</span>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="description" 
+                                name="description" 
+                                rows="5"
+                                placeholder="Please describe the issue in detail..."
+                                minlength="10"
+                                maxlength="2000"
+                                required
+                            >{% if form_data %}{{ form_data.description }}{% endif %}</textarea>
+                            <div class="form-text">10-2000 characters. Be specific to help maintenance staff understand the problem.</div>
+                        </div>
+
+                        <!-- Duplicate Warning Preview -->
+                        <div id="duplicateWarning" class="alert alert-info border-0 d-none mb-4" role="alert">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="bi bi-info-circle-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-2 fw-bold">Similar Issue Found</h6>
+                                    <p class="mb-2 small" id="duplicateMessage"></p>
+                                    <p class="mb-0 small text-muted">
+                                        Your report will still be submitted and linked to increase priority.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="bi bi-send-fill me-2"></i> Submit Report
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <i class="bi bi-shield-check me-1"></i>
+                    All submissions are reviewed by maintenance staff. Emergency safety issues are escalated automatically.
+                </small>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple duplicate check (typeahead preview)
+let checkTimeout = null;
+
+function checkDuplicates() {
+    const building = document.getElementById('building').value;
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    
+    // Need building and some text
+    if (!building || (title.length + description.length) < 10) {
+        document.getElementById('duplicateWarning').classList.add('d-none');
+        return;
+    }
+    
+    const query = title + ' ' + description;
+    const url = `/api/check-duplicates?building=${encodeURIComponent(building)}&query=${encodeURIComponent(query)}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.similar_complaints && data.similar_complaints.length > 0) {
+                const count = data.similar_complaints[0].duplicate_count;
+                const message = `${count} student${count > 1 ? 's' : ''} already reported a similar issue in this building.`;
+                document.getElementById('duplicateMessage').textContent = message;
+                document.getElementById('duplicateWarning').classList.remove('d-none');
+            } else {
+                document.getElementById('duplicateWarning').classList.add('d-none');
+            }
+        })
+        .catch(err => {
+            console.error('Duplicate check failed:', err);
+        });
+}
+
+// Debounced duplicate checking
+document.getElementById('title').addEventListener('input', () => {
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(checkDuplicates, 500);
+});
+
+document.getElementById('description').addEventListener('input', () => {
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(checkDuplicates, 500);
+});
+
+document.getElementById('building').addEventListener('change', () => {
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(checkDuplicates, 300);
+});
+</script>
+{% endblock %}

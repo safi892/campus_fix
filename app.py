@@ -1,13 +1,30 @@
 """
 CampusFix AI - University Maintenance & Issue Tracking Application
-Milestone 1: Application entry point with landing page and health check.
+Milestone 2: Complete complaint submission and tracking system.
 """
 
+import os
 from flask import Flask, render_template, jsonify
+
+from db import init_db
 
 def create_app():
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "campusfix-hackathon-dev-secret-key"
+    
+    # Configuration
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "campusfix-hackathon-dev-secret-key")
+    app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5MB max request size
+    
+    # Initialize database on first request
+    with app.app_context():
+        init_db()
+    
+    # Register blueprints
+    from routes.submit import submit_bp
+    from routes.track import track_bp
+    
+    app.register_blueprint(submit_bp)
+    app.register_blueprint(track_bp)
 
     @app.route("/")
     def index():
@@ -23,8 +40,8 @@ def create_app():
         return jsonify({
             "status": "healthy",
             "app": "CampusFix AI",
-            "version": "0.1.0",
-            "milestone": 1,
+            "version": "0.2.0",
+            "milestone": 2,
             "message": "CampusFix AI core service is running smoothly."
         }), 200
 

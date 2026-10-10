@@ -18,10 +18,9 @@
                     When 15 students report the same broken AC unit, maintenance staff shouldn't drown in 15 separate tickets. CampusFix AI groups duplicates, escalates safety hazards, and keeps students updated.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <button class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm" disabled>
+                    <a href="{{ url_for('submit.submit_form') }}" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm">
                         <i class="bi bi-plus-circle me-1"></i> Report an Issue
-                        <span class="badge bg-light text-dark ms-2 fw-normal" style="font-size: 0.75rem;">Milestone 2</span>
-                    </button>
+                    </a>
                     <a href="{{ url_for('health_check') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill" target="_blank">
                         <i class="bi bi-heart-pulse me-1"></i> System Health
                     </a>
@@ -61,9 +60,9 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-info border-0 mt-3 mb-0 py-2 small">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Next Milestone: Complaint submission form &amp; SQLite database setup.
+                    <div class="alert alert-success border-0 mt-3 mb-0 py-2 small">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Milestone 2 Complete: Database, submission & tracking active!
                     </div>
                 </div>
             </div>
@@ -147,15 +146,15 @@
                         <div class="d-flex mb-3">
                             <span class="badge bg-success me-3 py-2 px-3 align-self-start">M1</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">Core Setup &amp; Landing Page (Current)</h6>
+                                <h6 class="mb-0 fw-bold">Core Setup &amp; Landing Page ✓</h6>
                                 <small class="text-muted">Flask setup, responsive templates, health check, and setup guide.</small>
                             </div>
                         </div>
                         <div class="d-flex mb-3">
-                            <span class="badge bg-secondary me-3 py-2 px-3 align-self-start">M2</span>
+                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M2</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite</h6>
-                                <small class="text-muted">Student complaint form, validation, and database storage.</small>
+                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite (Current)</h6>
+                                <small class="text-muted">Student complaint form, validation, tracking, and database storage.</small>
                             </div>
                         </div>
                         <div class="d-flex">

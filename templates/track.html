@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Track Issue {{ complaint.reference_code }} - CampusFix AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            
+            <!-- Header with Reference Code -->
+            <div class="text-center mb-5">
+                <h1 class="display-6 fw-bold mb-3">Issue Tracking</h1>
+                <div class="d-inline-flex align-items-center bg-light border rounded-pill px-4 py-2">
+                    <span class="fw-bold text-primary me-2" id="referenceCode">{{ complaint.reference_code }}</span>
+                    <button class="btn btn-sm btn-outline-secondary border-0" onclick="copyReference()" title="Copy reference code">
+                        <i class="bi bi-clipboard" id="copyIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Tracking Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    
+                    <!-- Status Badges -->
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <span class="badge bg-{{ urgency_class }} px-3 py-2">
+                            {% if complaint.safety_hazard %}
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            {% endif %}
+                            {{ complaint.urgency }} Priority
+                        </span>
+                        
+                        {% if complaint.safety_hazard %}
+                        <span class="badge bg-danger px-3 py-2 safety-pulse">
+                            <i class="bi bi-shield-fill-exclamation me-1"></i> Safety Hazard
+                        </span>
+                        {% endif %}
+                        
+                        {% if linked_count > 0 %}
+                        <span class="badge bg-warning text-dark px-3 py-2">
+                            <i class="bi bi-fire me-1"></i> {{ linked_count + 1 }} Reports
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Progress Stepper -->
+                    <div class="mb-5">
+                        <h5 class="fw-semibold mb-4">Status Progress</h5>
+                        <div class="progress-stepper">
+                            <div class="progress-step {% if current_step >= 1 %}active{% endif %} {% if current_step > 1 %}completed{% endif %}">
+                                <div class="step-circle">
+                                    {% if current_step > 1 %}
+                                        <i class="bi bi-check-lg"></i>
+                                    {% else %}
+                                        1
+                                    {% endif %}
+                                </div>
+                                <div class="step-label">Submitted</div>
+                            </div>
+                            
+                            <div class="progress-line {% if current_step > 1 %}completed{% endif %}"></div>
+                            
+                            <div class="progress-step {% if current_step >= 2 %}active{% endif %} {% if current_step > 2 %}completed{% endif %}">
+                                <div class="step-circle">
+                                    {% if current_step > 2 %}
+                                        <i class="bi bi-check-lg"></i>
+                                    {% else %}
+                                        2
+                                    {% endif %}
+                                </div>
+                                <div class="step-label">Triaged</div>
+                            </div>
+                            
+                            <div class="progress-line {% if current_step > 2 %}completed{% endif %}"></div>
+                            
+                            <div class="progress-step {% if current_step >= 3 %}active{% endif %} {% if current_step > 3 %}completed{% endif %}">
+                                <div class="step-circle">
+                                    {% if current_step > 3 %}
+                                        <i class="bi bi-check-lg"></i>
+                                    {% else %}
+                                        3
+                                    {% endif %}
+                                </div>
+                                <div class="step-label">In Progress</div>
+                            </div>
+                            
+                            <div class="progress-line {% if current_step > 3 %}completed{% endif %}"></div>
+                            
+                            <div class="progress-step {% if current_step >= 4 %}active{% endif %}">
+                                <div class="step-circle">
+                                    {% if current_step >= 4 %}
+                                        <i class="bi bi-check-lg"></i>
+                                    {% else %}
+                                        4
+                                    {% endif %}
+                                </div>
+                                <div class="step-label">Resolved</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Issue Details -->
+                    <div class="border-top pt-4">
+                        <h5 class="fw-semibold mb-3">Issue Details</h5>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-building text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Building</small>
+                                        <span class="fw-semibold">{{ complaint.building }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if complaint.room %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-geo-alt text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Location</small>
+                                        <span class="fw-semibold">{{ complaint.room }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-tag text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Category</small>
+                                        <span class="fw-semibold">{{ complaint.category }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-calendar-event text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Submitted</small>
+                                        <span class="fw-semibold">{{ created_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6 class="fw-semibold mb-2">{{ complaint.title }}</h6>
+                            <p class="text-muted mb-0">{{ complaint.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Volume Signal -->
+                    {% if linked_count > 0 %}
+                    <div class="alert alert-warning border-0 mt-4" role="alert">
+                        <div class="d-flex">
+                            <i class="bi bi-people-fill fs-4 me-3"></i>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Multiple Reports Linked</h6>
+                                <p class="mb-0 small">
+                                    Linked with <strong>{{ linked_count }} other report{{ 's' if linked_count != 1 }}</strong> in this building.
+                                    Priority elevated.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Last Updated -->
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Last updated: {{ updated_formatted }}
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{{ url_for('submit.submit_form') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Report Another Issue
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house me-1"></i> Back to Home
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="copyToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Reference code copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyReference() {
+    const refCode = document.getElementById('referenceCode').textContent.trim();
+    navigator.clipboard.writeText(refCode).then(() => {
+        // Change icon to checkmark
+        const icon = document.getElementById('copyIcon');
+        icon.classList.remove('bi-clipboard');
+        icon.classList.add('bi-check2');
+        
+        // Show toast
+        const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+        toast.show();
+        
+        // Reset icon after 2 seconds
+        setTimeout(() => {
+            icon.classList.remove('bi-check2');
+            icon.classList.add('bi-clipboard');
+        }, 2000);
+    }).catch(err => {
+        console.error('Copy failed:', err);
+    });
+}
+</script>
+{% endblock %}
