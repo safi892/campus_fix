@@ -15,6 +15,11 @@ import db
 import seed
 from app import app
 from services import triage
+from werkzeug.security import generate_password_hash
+
+TEST_ADMIN_USERNAME = "test-admin"
+TEST_ADMIN_PASSWORD = "correct-horse-battery-staple"
+TEST_CSRF_TOKEN = "test-csrf-token"
 
 ENG = "Engineering Complex"
 AC_PARENT_REF = "CFX-2026-1001"
@@ -27,18 +32,36 @@ class StaffTestCase(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self._original_path = db.DB_PATH
+        self._original_auth_config = {
+            key: app.config.get(key)
+            for key in ("ADMIN_USERNAME", "ADMIN_PASSWORD_HASH", "SECRET_KEY")
+        }
+        app.config.update(
+            ADMIN_USERNAME=TEST_ADMIN_USERNAME,
+            ADMIN_PASSWORD_HASH=generate_password_hash(TEST_ADMIN_PASSWORD),
+            SECRET_KEY="staff-routes-test-secret",
+        )
         db.DB_PATH = os.path.join(self._tmp.name, "test.db")
         with contextlib.redirect_stdout(io.StringIO()):
             seed.seed_demo_data()
         self.client = app.test_client()
+        self._authenticate()
 
     def tearDown(self):
+        app.config.update(self._original_auth_config)
         db.DB_PATH = self._original_path
         self._tmp.cleanup()
 
+    def _authenticate(self, client=None):
+        """Mark a test client as logged in without testing login itself."""
+        client = client or self.client
+        with client.session_transaction() as session:
+            session["is_admin"] = True
+            session["csrf_token"] = TEST_CSRF_TOKEN
+
     # --- helpers -----------------------------------------------------
     def _post_json(self, url, payload):
-        return self.client.post(url, json=payload)
+        return self.client.post(url, json=payload, headers={"X-CSRF-Token": TEST_CSRF_TOKEN})
 
     def _id(self, reference_code):
         return db.get_complaint_by_reference(reference_code)["id"]
@@ -202,7 +225,11 @@ class StatusUpdateTests(StaffTestCase):
 
     def test_form_encoded_body_400(self):
         """Only JSON is accepted (blocks cross-site HTML form posts)."""
-        response = self.client.post(self.URL, data={"id": "1", "status": "Resolved"})
+        response = self.client.post(
+            self.URL,
+            data={"id": "1", "status": "Resolved"},
+            headers={"X-CSRF-Token": TEST_CSRF_TOKEN},
+        )
         self.assertEqual(response.status_code, 400)
         self.assertFalse(response.get_json()["success"])
 

@@ -17,6 +17,7 @@
         merge: board.dataset.mergeUrl,
         dismiss: board.dataset.dismissUrl,
     };
+    const csrfToken = board.dataset.csrfToken;
     const RELOAD_AFTER_MERGE_MS = 1200;
     const CARD_EXIT_MS = 350;
 
@@ -26,7 +27,10 @@
     async function postJson(url, payload) {
         const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
             body: JSON.stringify(payload),
         });
         const data = await response.json().catch(() => ({}));

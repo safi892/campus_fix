@@ -10,6 +10,7 @@ import logging
 
 from flask import Blueprint, jsonify, render_template, request
 
+from auth import authorize_staff_request
 import db
 from forms import ALLOWED_BUILDINGS, ALLOWED_CATEGORIES, ALLOWED_STATUSES, STATUS_FLOW
 from services import triage
@@ -17,6 +18,11 @@ from services import triage
 logger = logging.getLogger("campusfix.routes.staff")
 
 staff_bp = Blueprint("staff", __name__)
+
+@staff_bp.before_request
+def require_staff_access():
+    """Authorize every existing and future staff endpoint in one place."""
+    return authorize_staff_request()
 
 
 # ---------------------------------------------------------------------------
