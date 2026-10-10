@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}CampusFix AI - Smart Campus Maintenance{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+                    <i class="bi bi-stars me-1"></i> University Hackathon Project
+                </span>
+                <h1 class="hero-title mb-3">
+                    Campus Issues, <span class="hero-highlight">Intelligently Grouped</span> and Resolved Faster.
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    When 15 students report the same broken AC unit, maintenance staff shouldn't drown in 15 separate tickets. CampusFix AI groups duplicates, escalates safety hazards, and keeps students updated.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <button class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm" disabled>
+                        <i class="bi bi-plus-circle me-1"></i> Report an Issue
+                        <span class="badge bg-light text-dark ms-2 fw-normal" style="font-size: 0.75rem;">Milestone 2</span>
+                    </button>
+                    <a href="{{ url_for('health_check') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill" target="_blank">
+                        <i class="bi bi-heart-pulse me-1"></i> System Health
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card shadow-sm border-0 p-4 rounded-4 bg-white">
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="p-2 bg-success-subtle text-success rounded-circle me-2">
+                                <i class="bi bi-shield-check fs-5"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">System Status</h6>
+                                <small class="text-muted">Milestone 1 Online</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success px-3 py-2 rounded-pill">Active</span>
+                    </div>
+
+                    <div class="vstack gap-3 small">
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Backend Framework:</span>
+                            <span class="fw-semibold text-dark">Flask 3.0</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Python Runtime:</span>
+                            <span class="fw-semibold text-dark">3.11</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Database Engine:</span>
+                            <span class="fw-semibold text-dark">SQLite (Zero-Config)</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>AI Core:</span>
+                            <span class="fw-semibold text-dark">all-MiniLM-L6-v2 (CPU Ready)</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info border-0 mt-3 mb-0 py-2 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Next Milestone: Complaint submission form &amp; SQLite database setup.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Pillars Section -->
+<section id="features" class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How CampusFix AI Works</h2>
+            <p class="text-muted">Built around human-in-the-loop AI and transparent maintenance operations.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper icon-blue">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <h5 class="fw-bold">Duplicate Clustering</h5>
+                    <p class="text-muted small mb-0">
+                        Instead of spamming staff with 20 individual reports for one leaking sink, reports are clustered with an "N students reported this" priority booster.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper icon-amber">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h5 class="fw-bold">Safety Escalation</h5>
+                    <p class="text-muted small mb-0">
+                        Critical hazards like exposed wires, gas leaks, and flooding are immediately tagged with high urgency for rapid staff triage.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper icon-emerald">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h5 class="fw-bold">Human-in-the-Loop</h5>
+                    <p class="text-muted small mb-0">
+                        AI provides similarity scores and recommendations, but maintenance staff always retain ultimate authority over approvals and priority actions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About & Architecture Section -->
+<section id="about" class="py-5 bg-light border-top">
+    <div class="container py-3">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+                <h3 class="fw-bold mb-3">Hackathon Architecture Principles</h3>
+                <ul class="list-unstyled vstack gap-3 text-secondary">
+                    <li class="d-flex align-items-start">
+                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                        <span><strong>Graceful Fallbacks:</strong> If the AI sentence-transformer model is offline, the app seamlessly falls back to keyword matching without crashing.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                        <span><strong>No Record Loss:</strong> Duplicate clustering never deletes original student reports; every student's tracking reference remains valid.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                        <span><strong>Zero Paid APIs:</strong> 100% self-hosted, local CPU execution, and open-source tooling.</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="p-4 bg-white rounded-3 border">
+                    <h5 class="fw-bold mb-2">Milestone Roadmap</h5>
+                    <div class="timeline mt-3">
+                        <div class="d-flex mb-3">
+                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M1</span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Core Setup &amp; Landing Page (Current)</h6>
+                                <small class="text-muted">Flask setup, responsive templates, health check, and setup guide.</small>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <span class="badge bg-secondary me-3 py-2 px-3 align-self-start">M2</span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite</h6>
+                                <small class="text-muted">Student complaint form, validation, and database storage.</small>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <span class="badge bg-secondary me-3 py-2 px-3 align-self-start">M3</span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">AI Duplicate Detection &amp; Staff Dashboard</h6>
+                                <small class="text-muted">MiniLM similarity clustering, safety alerts, and staff approval interface.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
