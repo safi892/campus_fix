@@ -53,38 +53,71 @@
                             </div>
                         </div>
 
-                        <!-- 2. Campus Location -->
-                        <div class="mb-4">
-                            <label for="location" class="form-label fw-semibold">
-                                <i class="bi bi-geo-alt-fill text-primary me-1"></i> Campus Location / Facility <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select form-select-lg" id="location" name="location" required>
-                                <option value="" selected disabled>Select location (e.g. LT3, Lab4, Library, Washroom)...</option>
-                                {% for loc in locations %}
-                                <option value="{{ loc }}" {% if form_data and (form_data.location == loc or form_data.building == loc) %}selected{% endif %}>
-                                    {{ loc }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <input type="hidden" id="building" name="building" value="{% if form_data %}{{ form_data.location or form_data.building }}{% endif %}">
-                            <div class="form-text">Choose the specific lecture hall, lab, common room, or campus area.</div>
+                        <!-- 2. Campus Location & Floor -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-7">
+                                <label for="location" class="form-label fw-semibold">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i> Campus Location / Facility <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select form-select-lg" id="location" name="location" required>
+                                    <option value="" selected disabled>Select location (e.g. LT3, Lab4, Library, Washroom)...</option>
+                                    {% for loc in locations %}
+                                    <option value="{{ loc }}" {% if form_data and (form_data.location == loc or form_data.building == loc) %}selected{% endif %}>
+                                        {{ loc }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" id="building" name="building" value="{% if form_data %}{{ form_data.location or form_data.building }}{% endif %}">
+                                <div class="form-text">Choose the specific hall, lab, or campus area.</div>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="floor" class="form-label fw-semibold">
+                                    <i class="bi bi-layers text-primary me-1"></i> Floor Level <span class="badge bg-light text-secondary fw-normal">Optional</span>
+                                </label>
+                                <select class="form-select form-select-lg" id="floor" name="floor">
+                                    <option value="">Select floor...</option>
+                                    {% for fl in floors %}
+                                    <option value="{{ fl }}" {% if form_data and form_data.floor == fl %}selected{% endif %}>
+                                        {{ fl }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">e.g. Ground Floor, 2nd Floor.</div>
+                            </div>
                         </div>
 
-                        <!-- 3. Room / Spot Detail (Optional) -->
-                        <div class="mb-4">
-                            <label for="room" class="form-label fw-semibold">
-                                Specific Spot / Location Details
-                            </label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="room" 
-                                name="room" 
-                                placeholder="e.g., Near front entrance, Desk #14, 2nd floor sink, Window side"
-                                value="{% if form_data %}{{ form_data.room }}{% endif %}"
-                                maxlength="100"
-                            >
-                            <div class="form-text">Optional detail to help technicians pinpoint the issue quickly.</div>
+                        <!-- 3. Spot Detail & Equipment ID -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-7">
+                                <label for="room" class="form-label fw-semibold">
+                                    <i class="bi bi-pin-map text-primary me-1"></i> Specific Spot / Location Details
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="room" 
+                                    name="room" 
+                                    placeholder="e.g., Near front entrance, Desk #14, Window side"
+                                    value="{% if form_data %}{{ form_data.room }}{% endif %}"
+                                    maxlength="100"
+                                >
+                                <div class="form-text">Optional details to help technicians locate the issue quickly.</div>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="equipment_id" class="form-label fw-semibold">
+                                    <i class="bi bi-cpu text-primary me-1"></i> Equipment / Device ID <span class="badge bg-light text-secondary fw-normal">Optional</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="equipment_id" 
+                                    name="equipment_id" 
+                                    placeholder="e.g. PC-14, AC-2, Projector #1"
+                                    value="{% if form_data %}{{ form_data.equipment_id }}{% endif %}"
+                                    maxlength="50"
+                                >
+                                <div class="form-text">Asset tag or machine number if applicable.</div>
+                            </div>
                         </div>
 
                         <!-- 4. Category Cards -->
@@ -164,6 +197,48 @@
                                 accept="image/*"
                             >
                             <div class="form-text">Upload a picture of the issue (JPG, PNG, WebP up to 5MB).</div>
+                        </div>
+
+                        <!-- 8. Perceived Urgency Level -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block mb-2">
+                                <i class="bi bi-speedometer2 text-primary me-1"></i> Urgency / Impact Level:
+                            </label>
+                            <div class="row g-2">
+                                {% for u in urgency_levels %}
+                                <div class="col-6 col-md-3">
+                                    <input 
+                                        type="radio" 
+                                        class="btn-check" 
+                                        name="urgency" 
+                                        id="urgency_{{ u.id }}" 
+                                        value="{{ u.id }}" 
+                                        {% if (form_data and form_data.urgency == u.id) or (not form_data and u.id == 'Normal') %}checked{% endif %}
+                                    >
+                                    <label class="btn btn-outline-secondary w-100 py-2 text-center text-truncate" for="urgency_{{ u.id }}" title="{{ u.label }}">
+                                        <i class="bi {{ u.icon }} me-1"></i> {{ u.id }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">Routine issues default to Normal. Physical hazards (smoke, sparks, gas leaks) are automatically promoted to Critical by safety AI.</div>
+                        </div>
+
+                        <!-- 9. Contact / Roll No (Optional) -->
+                        <div class="mb-4">
+                            <label for="contact_info" class="form-label fw-semibold">
+                                <i class="bi bi-person-lines-fill text-primary me-1"></i> Contact / Roll Number <span class="badge bg-light text-secondary fw-normal">Optional</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="contact_info" 
+                                name="contact_info" 
+                                placeholder="e.g. 2024-CS-042 or user@university.edu"
+                                value="{% if form_data %}{{ form_data.contact_info }}{% endif %}"
+                                maxlength="100"
+                            >
+                            <div class="form-text">Optional contact info if technicians need to coordinate room access or share resolution updates.</div>
                         </div>
 
                         <!-- 8. Live Duplicate Warning Preview -->

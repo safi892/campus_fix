@@ -165,10 +165,55 @@ class RouteTests(unittest.TestCase):
             "user_type": "student",
         }
         response = self.client.post("/submit", data=form_data)
+    def test_submit_with_floor_equipment_and_contact(self):
+        form_data = {
+            "title": "Computer keyboard broken at station 12",
+            "description": "Several keys are missing from the keyboard at computer station 12.",
+            "location": "Lab4",
+            "floor": "2nd Floor",
+            "room": "Row 3, Desk 12",
+            "equipment_id": "PC-12",
+            "contact_info": "student-2024@campus.edu",
+            "category": "IT",
+            "urgency": "High",
+            "user_type": "student",
+        }
+        response = self.client.post("/submit", data=form_data)
         self.assertEqual(response.status_code, 302)
         page = self.client.get(response.location).data
-        self.assertIn(b"IT", page)
-        self.assertIn(b"LT3", page)
+        self.assertIn(b"2nd Floor", page)
+        self.assertIn(b"PC-12", page)
+        self.assertIn(b"student-2024@campus.edu", page)
+        self.assertIn(b"High Priority", page)
+
+    def test_submit_user_critical_escalates_hazard(self):
+        form_data = {
+            "title": "Severe flooding in corridor",
+            "description": "Pipe burst and hallway has 2 inches of standing water.",
+            "location": "LT1",
+            "category": "Plumbing and water",
+            "urgency": "Critical",
+            "user_type": "staff",
+        }
+        response = self.client.post("/submit", data=form_data)
+        self.assertEqual(response.status_code, 302)
+        page = self.client.get(response.location).data
+        self.assertIn(b"Critical Priority", page)
+        self.assertIn(b"Safety Hazard", page)
+
+    def test_submit_blast_emergency_keyword(self):
+        form_data = {
+            "title": "Gas cylinder leak and blast risk",
+            "description": "Smell of gas cylinder leaking near the cafeteria kitchen stove.",
+            "location": "Cafeteria",
+            "category": "Safety",
+            "user_type": "teacher",
+        }
+        response = self.client.post("/submit", data=form_data)
+        self.assertEqual(response.status_code, 302)
+        page = self.client.get(response.location).data
+        self.assertIn(b"Critical Priority", page)
+        self.assertIn(b"Safety Hazard", page)
 
 
 if __name__ == "__main__":

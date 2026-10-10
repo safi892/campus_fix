@@ -15,6 +15,8 @@ from forms import (
     ALLOWED_CATEGORIES,
     DATASET_CATEGORIES,
     DATASET_LOCATIONS,
+    FLOORS,
+    URGENCY_LEVELS,
     USER_TYPES,
     sanitize_complaint_data,
     validate_complaint_submission,
@@ -40,6 +42,8 @@ def _render_form(error: str = "", form_data: dict | None = None, status: int = 2
         buildings=DATASET_LOCATIONS,  # backward compatibility alias
         categories=DATASET_CATEGORIES,
         user_types=USER_TYPES,
+        floors=FLOORS,
+        urgency_levels=URGENCY_LEVELS,
     )
     return html, status
 
@@ -69,6 +73,9 @@ def _save_complaint(clean_data: dict, urgency: str, safety_flag: int) -> str:
                 user_type=clean_data.get("user_type", "student"),
                 image_filename=clean_data.get("image_filename"),
                 location=clean_data.get("location"),
+                floor=clean_data.get("floor"),
+                equipment_id=clean_data.get("equipment_id"),
+                contact_info=clean_data.get("contact_info"),
             )
             return reference_code
         except sqlite3.IntegrityError:
@@ -111,6 +118,10 @@ def submit_complaint():
         "room": request.form.get("room", ""),
         "user_type": request.form.get("user_type", "student"),
         "image_filename": uploaded_image_filename or request.form.get("image_filename", ""),
+        "floor": request.form.get("floor", ""),
+        "equipment_id": request.form.get("equipment_id", ""),
+        "contact_info": request.form.get("contact_info", ""),
+        "urgency": request.form.get("urgency", "Normal"),
     }
 
     is_valid, error_message = validate_complaint_submission(form_data)
@@ -121,10 +132,15 @@ def submit_complaint():
 
     # Deterministic keyword scan: physical safety never depends on ML.
     is_hazard = scan_safety_hazard(f"{clean_data['title']} {clean_data['description']}")
-    urgency = "Critical" if is_hazard else "Normal"
+    if is_hazard or clean_data.get("urgency") == "Critical":
+        urgency = "Critical"
+        safety_flag = 1
+    else:
+        urgency = clean_data.get("urgency") or "Normal"
+        safety_flag = 0
 
     try:
-        reference_code = _save_complaint(clean_data, urgency, int(is_hazard))
+        reference_code = _save_complaint(clean_data, urgency, safety_flag)
     except Exception:
         logger.exception("Complaint submission failed")
         return _render_form(

@@ -7,7 +7,8 @@
 <div class="container py-5" id="staffBoard"
      data-status-url="{{ url_for('staff.update_status') }}"
      data-merge-url="{{ url_for('staff.merge_cluster') }}"
-     data-dismiss-url="{{ url_for('staff.dismiss_suggestion') }}">
+     data-dismiss-url="{{ url_for('staff.dismiss_suggestion') }}"
+     data-csrf-token="{{ session.get('csrf_token', '') }}">
 
     <!-- Header -->
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
@@ -135,7 +136,9 @@
                             <h3 class="item-title mb-1">{{ job.title }}</h3>
                             <div class="meta-line">
                                 <span><i class="bi bi-building me-1" aria-hidden="true"></i>{{ job.building }}</span>
+                                {% if job.floor %}<span><i class="bi bi-layers me-1" aria-hidden="true"></i>{{ job.floor }}</span>{% endif %}
                                 {% if job.room %}<span><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ job.room }}</span>{% endif %}
+                                {% if job.equipment_id %}<span><i class="bi bi-cpu me-1" aria-hidden="true"></i>{{ job.equipment_id }}</span>{% endif %}
                                 <span><i class="bi bi-tag me-1" aria-hidden="true"></i>{{ job.category }}</span>
                                 <span><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ job.created_at | friendly_date }}</span>
                                 <a href="{{ url_for('track.track_complaint', reference_code=job.reference_code) }}">{{ job.reference_code }}</a>

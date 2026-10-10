@@ -115,6 +115,15 @@ def _migrate_schema(conn: sqlite3.Connection) -> None:
     if "duplicate_group" not in columns:
         conn.execute("ALTER TABLE complaints ADD COLUMN duplicate_group TEXT")
         logger.info("Migration: added complaints.duplicate_group")
+    if "floor" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN floor TEXT")
+        logger.info("Migration: added complaints.floor")
+    if "equipment_id" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN equipment_id TEXT")
+        logger.info("Migration: added complaints.equipment_id")
+    if "contact_info" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN contact_info TEXT")
+        logger.info("Migration: added complaints.contact_info")
 
 
 def reset_database() -> None:
@@ -141,6 +150,9 @@ def insert_complaint(
     image_filename: Optional[str] = None,
     duplicate_group: Optional[str] = None,
     location: Optional[str] = None,
+    floor: Optional[str] = None,
+    equipment_id: Optional[str] = None,
+    contact_info: Optional[str] = None,
 ) -> int:
     """Insert a new standalone complaint and return its id."""
     resolved_loc = location or building
@@ -149,12 +161,14 @@ def insert_complaint(
             INSERT INTO complaints (
                 reference_code, title, description, building, room,
                 category, urgency, safety_hazard, status, duplicate_count,
-                location, user_type, image_filename, duplicate_group
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Submitted', 1, ?, ?, ?, ?)
+                location, user_type, image_filename, duplicate_group,
+                floor, equipment_id, contact_info
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Submitted', 1, ?, ?, ?, ?, ?, ?, ?)
         """, (
             reference_code, title, description, resolved_loc, room,
             category, urgency, safety_hazard,
-            resolved_loc, user_type, image_filename, duplicate_group
+            resolved_loc, user_type, image_filename, duplicate_group,
+            floor, equipment_id, contact_info
         ))
         return cursor.lastrowid
 

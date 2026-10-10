@@ -134,6 +134,42 @@
                                 </div>
                             </div>
                             
+                            {% if complaint.floor %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-layers text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Floor Level</small>
+                                        <span class="fw-semibold">{{ complaint.floor }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if complaint.equipment_id %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-cpu text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Equipment / Device ID</small>
+                                        <span class="fw-semibold badge bg-light text-dark border">{{ complaint.equipment_id }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if complaint.contact_info %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-person-lines-fill text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Contact / Roll No</small>
+                                        <span class="fw-semibold">{{ complaint.contact_info }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
                             <div class="col-md-6">
                                 <div class="d-flex align-items-start">
                                     <i class="bi bi-calendar-event text-primary me-2 fs-5"></i>

@@ -87,12 +87,36 @@ DEFAULT_USER_TYPE = "student"
 STATUS_FLOW = ("Submitted", "Under Review", "In Progress", "Resolved")
 ALLOWED_STATUSES = set(STATUS_FLOW)
 
+# Campus floors
+FLOORS = [
+    "Ground Floor",
+    "1st Floor",
+    "2nd Floor",
+    "3rd Floor",
+    "4th Floor",
+    "Basement",
+    "Outdoor / Campus Grounds",
+]
+ALLOWED_FLOORS = set(FLOORS)
+
+# User urgency choices
+URGENCY_LEVELS = [
+    {"id": "Normal", "label": "Normal (Routine maintenance)", "icon": "bi-info-circle", "badge": "secondary"},
+    {"id": "Low", "label": "Low (Minor cosmetic issue, can wait)", "icon": "bi-clock", "badge": "light"},
+    {"id": "High", "label": "High (Disrupting class / lab work)", "icon": "bi-exclamation-circle", "badge": "warning"},
+    {"id": "Critical", "label": "Critical (Safety hazard / immediate risk)", "icon": "bi-exclamation-octagon", "badge": "danger"},
+]
+ALLOWED_URGENCIES = {u["id"] for u in URGENCY_LEVELS}
+DEFAULT_URGENCY = "Normal"
+
 # Input length constraints (DoS protection)
 MIN_TITLE_LENGTH = 5
 MAX_TITLE_LENGTH = 150
 MIN_DESC_LENGTH = 10
 MAX_DESC_LENGTH = 2000
 MAX_ROOM_LENGTH = 100
+MAX_EQUIPMENT_ID_LENGTH = 50
+MAX_CONTACT_INFO_LENGTH = 100
 
 
 def validate_complaint_submission(data: dict) -> Tuple[bool, str]:
@@ -113,6 +137,10 @@ def validate_complaint_submission(data: dict) -> Tuple[bool, str]:
     building = (data.get("location") or data.get("building") or "").strip()
     room = (data.get("room") or "").strip()
     user_type = (data.get("user_type") or DEFAULT_USER_TYPE).strip().lower()
+    floor = (data.get("floor") or "").strip()
+    equipment_id = (data.get("equipment_id") or "").strip()
+    contact_info = (data.get("contact_info") or "").strip()
+    urgency = (data.get("urgency") or DEFAULT_URGENCY).strip()
     
     # Validate title
     if not title:
@@ -145,6 +173,22 @@ def validate_complaint_submission(data: dict) -> Tuple[bool, str]:
     # Validate room (optional but length-limited)
     if room and len(room) > MAX_ROOM_LENGTH:
         return False, f"Room/location detail must not exceed {MAX_ROOM_LENGTH} characters."
+
+    # Validate floor (optional, allowlist)
+    if floor and floor not in ALLOWED_FLOORS and len(floor) > 50:
+        return False, "Invalid floor selected."
+
+    # Validate equipment_id (optional but length-limited)
+    if equipment_id and len(equipment_id) > MAX_EQUIPMENT_ID_LENGTH:
+        return False, f"Equipment ID must not exceed {MAX_EQUIPMENT_ID_LENGTH} characters."
+
+    # Validate contact_info (optional but length-limited)
+    if contact_info and len(contact_info) > MAX_CONTACT_INFO_LENGTH:
+        return False, f"Contact info must not exceed {MAX_CONTACT_INFO_LENGTH} characters."
+
+    # Validate urgency (optional, allowlist)
+    if urgency and urgency not in ALLOWED_URGENCIES:
+        return False, "Invalid urgency level selected."
     
     return True, ""
 
@@ -164,13 +208,21 @@ def sanitize_complaint_data(data: dict) -> dict:
     if user_type not in ALLOWED_USER_TYPES:
         user_type = DEFAULT_USER_TYPE
 
+    urgency = (data.get("urgency") or DEFAULT_URGENCY).strip()
+    if urgency not in ALLOWED_URGENCIES:
+        urgency = DEFAULT_URGENCY
+
     return {
         "title": data.get("title", "").strip(),
         "description": data.get("description", "").strip(),
         "category": data.get("category", "").strip(),
         "building": resolved_loc,
         "location": resolved_loc,
-        "room": data.get("room", "").strip() or None,  # Convert empty string to None
+        "room": data.get("room", "").strip() or None,
         "user_type": user_type,
         "image_filename": data.get("image_filename", "").strip() or None,
+        "floor": data.get("floor", "").strip() or None,
+        "equipment_id": data.get("equipment_id", "").strip() or None,
+        "contact_info": data.get("contact_info", "").strip() or None,
+        "urgency": urgency,
     }
