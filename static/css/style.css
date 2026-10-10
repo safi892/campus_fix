@@ -572,18 +572,10 @@ textarea:focus-visible {
     }
 }
 
-/* Login grid guard: Bootstrap's responsive column utilities must never shrink
-   the authentication card below a usable width in embedded/mobile previews. */
-.login-page > .row.justify-content-center {
+/* Login card sizing is independent of Bootstrap grid utilities. */
+.login-page .login-shell {
     display: block;
-    width: 100% !important;
-    margin-right: 0;
-    margin-left: 0;
-}
-
-.login-page > .row.justify-content-center > [class*="col-"] {
-    width: 100% !important;
-    max-width: 34rem;
+    width: min(calc(100vw - 2rem), 34rem) !important;
     min-width: 0;
     margin-right: auto;
     margin-left: auto;
@@ -592,7 +584,8 @@ textarea:focus-visible {
 }
 
 @media (max-width: 575.98px) {
-    .login-page > .row.justify-content-center > [class*="col-"] {
+    .login-page .login-shell {
+        width: calc(100vw - 2rem) !important;
         max-width: none;
     }
 
@@ -607,5 +600,57 @@ textarea:focus-visible {
 
     .login-card .feature-icon-wrapper + .page-title {
         margin-top: 0.85rem !important;
+    }
+}
+
+/* Use the visual viewport for the login shell. This avoids an embedded preview
+   scaling a desktop Bootstrap container down into an unusable mobile card. */
+.login-page .login-shell {
+    width: min(calc(100vw - 2rem), 34rem) !important;
+}
+
+@media (max-width: 575.98px) {
+    .login-page .login-shell {
+        width: calc(100vw - 2rem) !important;
+        max-width: none;
+    }
+}
+
+/* Component-level responsiveness: some embedded previews report a desktop
+   viewport while rendering a narrow card. Container queries respond to the
+   card's actual usable width, so text and controls stay usable. */
+.login-card {
+    container-type: inline-size;
+}
+
+.demo-credentials > div {
+    min-width: 0;
+}
+
+@container (max-width: 22rem) {
+    .login-card .card-body {
+        padding: 1.25rem !important;
+    }
+
+    .login-card .page-title {
+        font-size: 1.6rem;
+        line-height: 1.15;
+    }
+
+    .login-card .feature-icon-wrapper {
+        width: 44px;
+        height: 44px;
+    }
+
+    .demo-credentials {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.75rem !important;
+    }
+
+    .demo-credentials-icon {
+        width: 1.8rem;
+        height: 1.8rem;
+        flex-basis: 1.8rem;
     }
 }
