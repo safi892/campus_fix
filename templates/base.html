@@ -11,7 +11,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3 site-nav">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
                 <i class="bi bi-tools text-primary me-2 fs-4" aria-hidden="true"></i>
@@ -60,7 +60,7 @@
         </div>
     </nav>
 
-    <main>
+    <main class="site-main">
         <div class="container pt-3">
             {% for category, message in get_flashed_messages(with_categories=true) %}
             <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
@@ -72,7 +72,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="py-4 mt-auto">
+    <footer class="py-4 mt-auto site-footer">
         <div class="container text-center">
             <p class="mb-1 fw-medium">CampusFix AI &bull; Intelligent University Maintenance Management</p>
             <small class="text-muted">Offline AI duplicate clustering &bull; Deterministic safety escalation &bull; Human-in-the-loop review</small>

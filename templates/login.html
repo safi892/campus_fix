@@ -3,10 +3,10 @@
 {% block title %}Staff Sign In - CampusFix AI{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-5 login-page">
     <div class="row justify-content-center">
         <div class="col-sm-10 col-md-7 col-lg-5">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 login-card">
                 <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
                         <span class="feature-icon-wrapper icon-blue mx-auto"><i class="bi bi-shield-lock"></i></span>
@@ -20,6 +20,11 @@
                         Staff login is not configured. Contact the application administrator.
                     </div>
                     {% else %}
+                        <div class="alert alert-info border-0 py-2 px-3 small rounded-3 mb-3 d-flex align-items-center">
+                            <i class="bi bi-key-fill text-primary fs-5 me-2"></i>
+                            <div>Demo Credentials: <strong>admin</strong> / <strong>admin</strong></div>
+                        </div>
+
                         {% if error %}
                         <div class="alert alert-danger" role="alert">
                             <i class="bi bi-exclamation-circle-fill me-2" aria-hidden="true"></i>{{ error }}
@@ -33,12 +38,12 @@
                             <div class="mb-3">
                                 <label for="username" class="form-label fw-semibold">Username</label>
                                 <input id="username" name="username" type="text" class="form-control"
-                                       autocomplete="username" required autofocus>
+                                       value="admin" placeholder="admin" autocomplete="username" required autofocus>
                             </div>
                             <div class="mb-4">
                                 <label for="password" class="form-label fw-semibold">Password</label>
                                 <input id="password" name="password" type="password" class="form-control"
-                                       autocomplete="current-password" required>
+                                       placeholder="admin" autocomplete="current-password" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 rounded-pill">
                                 <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Sign In

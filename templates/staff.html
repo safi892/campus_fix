@@ -4,7 +4,7 @@
 {% block title %}Staff Dashboard - CampusFix AI{% endblock %}
 
 {% block content %}
-<div class="container py-5" id="staffBoard"
+<div class="container py-5 staff-page" id="staffBoard"
      data-status-url="{{ url_for('staff.update_status') }}"
      data-merge-url="{{ url_for('staff.merge_cluster') }}"
      data-dismiss-url="{{ url_for('staff.dismiss_suggestion') }}"

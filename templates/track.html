@@ -4,23 +4,23 @@
 {% block title %}Track Issue {{ complaint.reference_code }} - CampusFix AI{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-5 track-page">
     <div class="row justify-content-center">
         <div class="col-lg-9 col-xl-8">
             
             <!-- Header with Reference Code -->
             <div class="text-center mb-5">
                 <h1 class="display-6 fw-bold mb-3">Issue Tracking</h1>
-                <div class="d-inline-flex align-items-center bg-light border rounded-pill px-4 py-2">
+                <div class="d-inline-flex align-items-center bg-light border rounded-pill px-4 py-2 reference-chip">
                     <span class="fw-bold text-primary me-2" id="referenceCode">{{ complaint.reference_code }}</span>
-                    <button class="btn btn-sm btn-outline-secondary border-0" onclick="copyReference()" title="Copy reference code">
+                    <button class="btn btn-sm btn-outline-secondary border-0" onclick="copyReference()" title="Copy reference code" aria-label="Copy reference code">
                         <i class="bi bi-clipboard" id="copyIcon"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Main Tracking Card -->
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card shadow-sm border-0 mb-4 tracking-card">
                 <div class="card-body p-4">
                     
                     <!-- Status Badges -->

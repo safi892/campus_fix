@@ -43,11 +43,19 @@ def _session_secret() -> str:
 
 def create_app() -> Flask:
     app = Flask(__name__)
+
+    # Default development credentials (admin / admin) if not specified in environment
+    default_dev_hash = (
+        "scrypt:32768:8:1$BJkdaO51ytfZ1aLM$259238fdc0ba4d18d3055a3548b047d3c0a3a1e8dc8dbfb818dd171d1bcdf0f31b9004ed619e4c18323efec0e76ee06f254075ee0be056d44aedbda23a66ddb9"
+    )
+    admin_user = os.environ.get("ADMIN_USERNAME", "admin")
+    admin_hash = os.environ.get("ADMIN_PASSWORD_HASH", default_dev_hash)
+
     app.config.update(
         SECRET_KEY=_session_secret(),
         MAX_CONTENT_LENGTH=5 * 1024 * 1024,  # 5 MB max request size
-        ADMIN_USERNAME=os.environ.get("ADMIN_USERNAME"),
-        ADMIN_PASSWORD_HASH=os.environ.get("ADMIN_PASSWORD_HASH"),
+        ADMIN_USERNAME=admin_user,
+        ADMIN_PASSWORD_HASH=admin_hash,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
