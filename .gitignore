@@ -8,3 +8,6 @@ instance/
 models/
 static/uploads/*
 !static/uploads/.gitkeep
+.ai/
+*.md
+!README.md
