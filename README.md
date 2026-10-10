@@ -34,8 +34,10 @@ pip install -r requirements.txt
 
 ### 4. Start the Application
 ```bash
-python app.py
+python3 app.py
 ```
+*(Or `python app.py`. Note: on macOS if your shell has an alias overriding `python`, use `python3 app.py` or `unalias python`)*
+
 By default, the application runs on **http://127.0.0.1:5001** (Port 5001 is used to avoid macOS AirPlay Receiver conflicts on port 5000).
 
 ---
