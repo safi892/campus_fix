@@ -3,6 +3,7 @@ CampusFix AI — Machine Learning & Similarity Engine
 Implements CPU-based semantic similarity with automatic fallback and safety scanning.
 """
 
+import os
 import re
 import logging
 
@@ -43,15 +44,25 @@ _model_load_attempted = False
 def get_sentence_transformer():
     """
     Loads all-MiniLM-L6-v2 on CPU.
+    Prefers local 'models/all-MiniLM-L6-v2' folder if present for 100% offline support.
     Returns None if the library or weights fail to load, triggering fallback.
     """
     global _model_instance, _model_load_attempted
     if not _model_load_attempted:
         _model_load_attempted = True
         try:
-            logger.info("Loading sentence-transformers (all-MiniLM-L6-v2) on CPU...")
             from sentence_transformers import SentenceTransformer
-            _model_instance = SentenceTransformer("all-MiniLM-L6-v2")
+            local_model_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "models", "all-MiniLM-L6-v2"
+            )
+
+            if os.path.isdir(local_model_path):
+                logger.info("Loading local offline model from: %s", local_model_path)
+                _model_instance = SentenceTransformer(local_model_path)
+            else:
+                logger.info("Local model folder not found. Loading all-MiniLM-L6-v2 on CPU...")
+                _model_instance = SentenceTransformer("all-MiniLM-L6-v2")
+
             logger.info("SentenceTransformer loaded successfully.")
         except Exception as e:
             logger.warning(
