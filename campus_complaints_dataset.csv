@@ -1,0 +1,220 @@
+id,title,description,location,category,duplicate_group,is_safety,user_type,image_filename
+1,Water cooler not working,The water cooler outside Lab2 is not giving any water since morning,Lab2,Plumbing and water,G01,no,student,cooler_lab2_a.jpg
+2,No water from cooler,Cooler near Lab2 is empty and we are thirsty after class,Lab2,Plumbing and water,G01,no,student,cooler_lab2_b.jpg
+3,Lab2 cooler broken,water cooler beside lab2 not working please fix,Lab2,Plumbing and water,G01,no,student,
+4,Cooler issue,The water cooler near Lab2 has stopped working again,Lab2,Plumbing and water,G01,no,teacher,
+5,Projector not working,Projector in LT3 is not turning on and the lecture got delayed,LT3,IT,G02,no,teacher,projector_lt3.jpg
+6,LT3 projector problem,projector in lt3 shows only a blue screen,LT3,IT,G02,no,student,
+7,No display in LT3,"The projector in LT3 has no display, sir had to use the board",LT3,IT,G02,no,student,
+8,Projector issue,LT3 projector is not working since yesterday,LT3,IT,G02,no,student,
+9,WiFi not working in library,Library WiFi is completely down and I cannot open the student portal,Library,IT,G03,no,student,
+10,Library internet down,"no internet in the library, I had to submit my assignment",Library,IT,G03,no,student,wifi_library.jpg
+11,WiFi keeps disconnecting,WiFi in the library disconnects every few minutes,Library,IT,G03,no,student,
+12,Library WiFi problem,The internet in the library is not working today,Library,IT,G03,no,teacher,
+13,No water in washroom,There is no water in the girls washroom since morning,Girls Washroom,Plumbing and water,G04,no,student,
+14,Girls washroom water problem,"girls washroom has no water supply, please check",Girls Washroom,Plumbing and water,G04,no,student,girls_washroom_tap.jpg
+15,Water supply stopped,Water is not coming in the girls washroom taps,Girls Washroom,Plumbing and water,G04,no,student,
+16,Dirty washroom,The boys washroom is very dirty and smells bad,Boys Washroom,Cleaning,G05,no,student,boys_washroom_dirty.jpg
+17,Boys washroom not cleaned,boys washroom has not been cleaned for many days,Boys Washroom,Cleaning,G05,no,student,
+18,Bad smell in washroom,"Terrible smell in the boys washroom, it needs cleaning",Boys Washroom,Cleaning,G05,no,student,
+19,AC not cooling,AC in LT5 is on but it is not cooling at all,LT5,Electrical,G06,no,student,ac_lt5.jpg
+20,LT5 AC not working,"AC of LT5 is not working since 2 days, class is very hot",LT5,Electrical,G06,no,student,
+21,Hot in LT5,"The AC in LT5 is not cooling, sir stopped the lecture",LT5,Electrical,G06,no,teacher,
+22,Computers not turning on,5 computers in Lab4 are not turning on,Lab4,IT,G07,no,student,pc_lab4.jpg
+23,Lab4 PCs dead,"many pcs in lab4 are not starting, three of us share one pc",Lab4,IT,G07,no,student,
+24,Systems not working,Several systems in Lab4 show a black screen and do not start,Lab4,IT,G07,no,teacher,
+25,Lab4 computers problem,computers in lab 4 are not working,Lab4,IT,G07,no,student,
+26,Dirty tables,Tables in the cafeteria are not cleaned and flies are everywhere,Cafeteria,Cleaning,G08,no,student,cafeteria_tables.jpg
+27,Cafeteria tables dirty,"cafeteria tables are dirty, nobody wipes them",Cafeteria,Cleaning,G08,no,student,
+28,Cafeteria cleanliness,The seating area in the cafeteria is dirty and needs cleaning,Cafeteria,Cleaning,G08,no,teacher,
+29,Broken chair,One chair in LT1 is broken and the leg is loose,LT1,Furniture,G09,no,student,chair_lt1.jpg
+30,Chair broken,Chair in LT1 is broken,LT1,Furniture,G09,no,student,
+31,Loose chair,The chair near the window in LT1 wobbles a lot,LT1,Furniture,G09,no,student,chair_lt1_b.jpg
+32,Parking lights off,The lights in the parking area are not working at night,Parking,Electrical,G10,no,student,parking_dark.jpg
+33,Dark parking,"parking is very dark in the evening, lights are off",Parking,Electrical,G10,no,student,
+34,No light in parking,Parking lights are not working and it is not safe to walk,Parking,Electrical,G10,no,teacher,
+35,Sink leaking,The sink in the girls washroom is leaking water,Girls Washroom,Plumbing and water,G11,no,student,sink_girls.jpg
+36,Water leak in sink,girls washroom sink keeps leaking and the floor is wet,Girls Washroom,Plumbing and water,G11,no,student,
+37,Sink dripping,The sink in the girls washroom is dripping all day,Girls Washroom,Plumbing and water,G11,no,student,
+38,Sparks from socket,"Sparks coming out of the socket near the Lab7 door, very dangerous",Lab7,Safety,G12,yes,student,spark_socket_lab7.jpg
+39,Socket sparking,socket in lab7 is sparking please check urgently,Lab7,Safety,G12,yes,student,
+40,Spark near lab door,I saw sparks from the wall socket at the entrance of Lab7,Lab7,Safety,G12,yes,teacher,
+41,Fans not working,Ceiling fans in LT8 are not working and it is very hot,LT8,Electrical,G13,no,student,fan_lt8.jpg
+42,LT8 fans off,fans in lt8 are not running even after switching on,LT8,Electrical,G13,no,student,
+43,No fan in class,All the fans in LT8 are not working,LT8,Electrical,G13,no,student,
+44,AC not working,AC in the girls common room is not working,Girls Common Room,Electrical,G14,no,student,
+45,Girls common room hot,"It is too hot in the girls common room, AC is off",Girls Common Room,Electrical,G14,no,student,ac_girls_common.jpg
+46,Common room AC issue,girls common room AC has stopped working,Girls Common Room,Electrical,G14,no,student,
+47,Printer not working,The printer in the admin area is not working and shows an error,Admin Area,IT,G15,no,student,printer_admin.jpg
+48,Admin printer problem,cannot print anything from the admin area printer,Admin Area,IT,G15,no,student,
+49,Printer error,Printer in admin area has a paper jam and is not printing,Admin Area,IT,G15,no,staff,
+50,Broken sofa,The sofa in the boys common room is broken,Boys Common Room,Furniture,G16,no,student,sofa_boys_common.jpg
+51,Sofa torn,boys common room sofa is torn and the spring is coming out,Boys Common Room,Furniture,G16,no,student,
+52,Damaged furniture,Furniture in the boys common room is damaged and unsafe to sit on,Boys Common Room,Furniture,G16,no,student,
+53,Board not cleaned,The whiteboard in LT10 is not cleaned and there are no markers,LT10,Cleaning,G17,no,teacher,
+54,LT10 board dirty,whiteboard in lt10 is full of old writing and not cleaned,LT10,Cleaning,G17,no,teacher,board_lt10.jpg
+55,Dirty whiteboard,Board in LT10 is dirty and hard to read,LT10,Cleaning,G17,no,student,
+56,Slow internet,Internet in the faculty area is very slow,Faculty Area,IT,G18,no,teacher,
+57,Faculty WiFi issue,wifi in faculty area keeps dropping during online classes,Faculty Area,IT,G18,no,teacher,
+58,Internet problem,The internet in the faculty area is not working properly,Faculty Area,IT,G18,no,teacher,
+59,Library lights off,Some lights in the library reading hall are not working,Library,Electrical,G19,no,student,library_lights.jpg
+60,Library is dark,"three tube lights in the library are off, hard to read",Library,Electrical,G19,no,student,
+61,Lights not working,The lights in the library study area are not working,Library,Electrical,G19,no,student,
+62,Water cooler not working,The water cooler outside Lab5 is not giving water,Lab5,Plumbing and water,,no,student,cooler_lab5.jpg
+63,Projector problem,The projector in LT4 has no signal from the laptop,LT4,IT,,no,teacher,
+64,WiFi slow in cafeteria,WiFi in the cafeteria is very slow,Cafeteria,IT,,no,student,
+65,No water in boys washroom,There is no water in the boys washroom taps,Boys Washroom,Plumbing and water,,no,student,
+66,Girls washroom dirty,The girls washroom has not been cleaned today,Girls Washroom,Cleaning,,no,student,
+67,AC not working,AC in LT9 is not working,LT9,Electrical,,no,student,
+68,Computers not working,3 computers in Lab9 are not turning on,Lab9,IT,,no,student,
+69,Dirty tables in library,Tables in the library are dusty and sticky,Library,Cleaning,,no,student,
+70,Broken chairs,Two chairs in LT7 are broken,LT7,Furniture,,no,student,chair_lt7.jpg
+71,Corridor lights off,The corridor lights near LT2 are not working,LT2,Electrical,,no,student,
+72,Sink leaking,The sink in the boys washroom is leaking,Boys Washroom,Plumbing and water,,no,student,
+73,Loose socket,The socket in Lab3 is loose and plugs keep falling out,Lab3,Electrical,,no,student,
+74,Fans not working,Two fans in LT12 are not working,LT12,Electrical,,no,student,
+75,AC problem,AC in the boys common room is not cooling,Boys Common Room,Electrical,,no,student,
+76,Library printer,The printer in the library is out of paper and toner,Library,IT,,no,student,
+77,Broken chairs,Chairs in the girls common room are broken,Girls Common Room,Furniture,,no,student,
+78,Gas smell,Strong gas smell in the cafeteria kitchen area,Cafeteria,Safety,,yes,student,
+79,Water near electric board,Water is leaking right next to the electric board in Lab6,Lab6,Safety,,yes,student,water_board_lab6.jpg
+80,Exposed wire,Exposed wire hanging from the ceiling in Lab1,Lab1,Safety,,yes,student,wire_lab1.jpg
+81,Smoke from UPS,Smoke was coming from the UPS in the admin area today,Admin Area,Safety,,yes,staff,
+82,Flooding in washroom,Water pipe burst and the boys washroom is flooded,Boys Washroom,Safety,,yes,student,flood_boys_washroom.jpg
+83,Fire in dustbin,The dustbin in the parking area caught fire from a cigarette,Parking,Safety,,yes,student,
+84,AC sparks,AC in LT6 started making sparks and smoke,LT6,Safety,,yes,teacher,
+85,Burning smell,Burning smell coming from the electric panel in LT11,LT11,Safety,,yes,student,panel_lt11.jpg
+86,Wire hanging,A bare wire is hanging near the door of the girls common room,Girls Common Room,Safety,,yes,student,
+87,Water on socket,"Water is dripping on the socket near the library entrance, risk of shock",Library,Safety,,yes,student,
+88,Flooding,The girls washroom floor is flooded because of a broken pipe,Girls Washroom,Safety,,yes,student,
+89,Smell of burning in cafeteria,I can smell something burning near the cafeteria kitchen and see smoke,Cafeteria,Safety,,yes,student,
+90,Sparks from switch board,Sparks came out of the switch board in the faculty area when I turned on the light,Faculty Area,Safety,,yes,teacher,
+91,Exposed wire on pole,An exposed wire is hanging from the light pole in the parking area,Parking,Safety,,yes,student,pole_wire_parking.jpg
+92,Smoke from projector,Smoke came out of the projector in LT2 during the lecture,LT2,Safety,,yes,teacher,
+93,Short circuit,There was a short circuit in Lab10 and the lights went off with sparks,Lab10,Safety,,yes,student,
+94,Gas smell near lab,There is a gas smell coming from the pipe near Lab8,Lab8,Safety,,yes,student,
+95,Fire extinguisher expired,The fire extinguisher in the library is expired,Library,Safety,,no,student,extinguisher_library.jpg
+96,Loose stair railing,The railing on the stairs near LT12 is loose,LT12,Safety,,no,student,
+97,CCTV not working,The CCTV camera in the parking area is not working,Parking,Safety,,no,student,
+98,Slippery floor,The floor near the admin area is very slippery when it rains,Admin Area,Safety,,no,student,
+99,No exit sign,There is no emergency exit sign in the cafeteria,Cafeteria,Safety,,no,student,
+100,Light not working,The light in LT6 is not working,LT6,Electrical,,no,student,
+101,Fan noise,The ceiling fan in LT11 makes a loud noise,LT11,Electrical,,no,student,
+102,Projector not turning on,Projector in LT7 does not turn on,LT7,IT,,no,teacher,
+103,Dirty corridor,The corridor near LT1 has not been swept for days,LT1,Cleaning,,no,student,
+104,WiFi slow,WiFi in Lab1 is very slow in the afternoon,Lab1,IT,,no,student,
+105,Tap dripping,The tap in the boys washroom keeps dripping,Boys Washroom,Plumbing and water,,no,student,
+106,Mouse not working,Mouse and keyboard are not working on some PCs in Lab2,Lab2,IT,,no,student,
+107,No sound in LT,The speaker in LT4 has no sound,LT4,IT,,no,teacher,
+108,Parking has no shade,There is no roof in the bike parking and bikes get very hot,Parking,Other,,no,student,parking_bikes.jpg
+109,Dustbin full,The dustbins outside LT5 are overflowing,LT5,Cleaning,,no,student,dustbin_lt5.jpg
+110,Broken chair arm,The writing arm of a chair in LT3 is broken,LT3,Furniture,,no,student,
+111,Not enough chairs,There are not enough chairs in LT8 and some students stand,LT8,Furniture,,no,student,
+112,Table is shaking,The table in Lab6 shakes and my laptop can fall,Lab6,Furniture,,no,student,
+113,Cooler water dirty,The water in the cooler near LT9 looks dirty,LT9,Plumbing and water,,no,student,cooler_lt9.jpg
+114,Cooler water warm,The water from the cooler in LT6 area is not cold,LT6,Plumbing and water,,no,student,
+115,Flush not working,The flush in the girls washroom is not working,Girls Washroom,Plumbing and water,,no,student,
+116,Sink blocked,The sink in the boys washroom is blocked and water is standing,Boys Washroom,Plumbing and water,,no,student,sink_boys.jpg
+117,Washroom lock broken,The lock of the girls washroom door is broken,Girls Washroom,Other,,no,student,
+118,Door handle broken,The door handle of LT4 is broken and the door does not open from outside,LT4,Furniture,,no,teacher,
+119,Window cracked,The window glass in LT2 is cracked,LT2,Other,,no,student,window_lt2.jpg
+120,Curtains torn,Curtains in LT1 are torn and the sun comes directly on the screen,LT1,Other,,no,student,
+121,Food quality,Food in the cafeteria is not fresh and the rice was undercooked,Cafeteria,Other,,no,student,
+122,Cafeteria hygiene,Plates in the cafeteria are not cleaned properly,Cafeteria,Cleaning,,no,student,
+123,Cafeteria prices,Cafeteria is charging more than the menu price for tea,Cafeteria,Other,,no,student,
+124,Long queue,The cafeteria has only one counter and the queue is very long in break time,Cafeteria,Other,,no,student,
+125,Stray dogs,Stray dogs near the parking scare students at night,Parking,Other,,no,student,
+126,No guard at gate,There is no guard at the parking entrance after 6 pm,Parking,Safety,,no,student,
+127,Parking potholes,There are big potholes in the parking and bikes can slip,Parking,Other,,no,student,pothole_parking.jpg
+128,Parking space,Not enough parking space for bikes in the morning,Parking,Other,,no,student,
+129,Library AC too cold,AC in the library is too cold and cannot be adjusted,Library,Electrical,,no,student,
+130,Torn books,Many books in the CS section of the library are torn,Library,Other,,no,student,
+131,Library chairs uncomfortable,Chairs in the library are old and half of them are broken,Library,Furniture,,no,student,
+132,Noise in library,Students talk loudly in the library and nobody stops them,Library,Other,,no,student,
+133,Library fan,Fans in the library reading hall are not working,Library,Electrical,,no,student,
+134,Student portal not opening,The student portal is not opening during registration,Admin Area,IT,,no,student,
+135,LMS login problem,I cannot log in to LMS and the password reset email is not coming,Admin Area,IT,,no,student,
+136,Marks not showing,My marks are not showing in the result portal,Admin Area,IT,,no,student,
+137,University email problem,University email is not receiving any messages since 2 days,Admin Area,IT,,no,student,
+138,Software missing,Visual Studio is not installed on the Lab1 computers,Lab1,IT,,no,student,
+139,Python missing,Python is not installed on the computers in Lab3,Lab3,IT,,no,student,
+140,Lab computers slow,Computers in Lab2 are very slow and take 10 minutes to start,Lab2,IT,,no,student,pc_slow_lab2.jpg
+141,Keyboard keys not working,Half of the keys on the keyboards in Lab5 do not work,Lab5,IT,,no,student,
+142,Smart board not working,The smart board in LT12 is not responding to touch,LT12,IT,,no,teacher,smartboard_lt12.jpg
+143,HDMI cable missing,The HDMI cable of the projector in LT9 is missing,LT9,IT,,no,teacher,
+144,Lab internet slow,Internet in Lab4 is very slow and I cannot download anything,Lab4,IT,,no,student,
+145,AC remote missing,The AC remote is missing in LT10,LT10,Electrical,,no,teacher,
+146,AC leaking,Water is dripping from the AC onto the students seats in LT4,LT4,Electrical,,no,student,ac_leak_lt4.jpg
+147,Bulb fused,The bulb is fused and the room is dark in Lab8,Lab8,Electrical,,no,student,
+148,Sockets loose,Sockets in LT10 are loose and the plugs fall out,LT10,Electrical,,no,student,
+149,Switch broken,The switch of the fan in LT3 is broken,LT3,Electrical,,no,student,switch_lt3.jpg
+150,No backup during power cut,There is no backup in the labs during load shedding and systems shut down,Lab6,Electrical,,no,student,
+151,Generator not starting,Generator did not start during the power cut and the classes were in dark,Admin Area,Electrical,,no,staff,
+152,UPS beeping,The UPS in Lab1 is beeping continuously,Lab1,Electrical,,no,teacher,
+153,Lift not working,The lift near the admin area is not working,Admin Area,Other,,no,student,lift_admin.jpg
+154,No ramp,There is no ramp for wheelchairs at the library entrance,Library,Other,,no,student,
+155,Notice board empty,The notice board near the admin area has old notices and nothing new,Admin Area,Other,,no,student,
+156,Hand wash no soap,There is no soap near the hand wash sink in the cafeteria,Cafeteria,Plumbing and water,,no,student,
+157,Cafeteria fans,Fans in the cafeteria are not working and it is very hot,Cafeteria,Electrical,,no,student,
+158,Sticky floor,The floor in the cafeteria is sticky and not mopped,Cafeteria,Cleaning,,no,student,
+159,Rats in cafeteria,I saw rats near the dustbins behind the cafeteria,Cafeteria,Cleaning,,no,student,rats_cafeteria.jpg
+160,Garbage smell,Garbage was not picked up and there is a bad smell behind the cafeteria,Cafeteria,Cleaning,,no,student,garbage_cafeteria.jpg
+161,Dust in room,Spider webs and dust in the corners of LT6,LT6,Cleaning,,no,student,
+162,Floor not mopped,The floor outside Lab3 is muddy and not mopped,Lab3,Cleaning,,no,student,
+163,Stairs dirty,The walls of the stairs near LT8 have paan stains,LT8,Cleaning,,no,student,stairs_stains.jpg
+164,No markers,There are no board markers in LT5,LT5,Other,,no,teacher,
+165,No soap in washroom,There is no soap or tissue in the girls washroom,Girls Washroom,Cleaning,,no,student,
+166,Stall door broken,The door of a washroom stall is broken in the boys washroom,Boys Washroom,Furniture,,no,student,
+167,Mirror broken,The mirror in the boys washroom is broken and has sharp glass,Boys Washroom,Other,,no,student,
+168,Water tank overflowing,The water tank near the library is overflowing,Library,Plumbing and water,,no,student,
+169,Low water pressure,Water pressure is very low in the girls washroom,Girls Washroom,Plumbing and water,,no,student,
+170,Pipe leaking,A pipe is leaking outside the admin area and there is a puddle on the path,Admin Area,Plumbing and water,,no,student,pipe_leak_admin.jpg
+171,Drain blocked,The drain behind the cafeteria is blocked and smells,Cafeteria,Plumbing and water,,no,student,
+172,Cooler water yellow,The water from the cooler near the parking is yellow,Parking,Plumbing and water,,no,student,
+173,Water cooler empty,The water cooler in the faculty area is empty,Faculty Area,Plumbing and water,,no,teacher,
+174,Tap broken,The tap in the faculty area washroom is broken,Faculty Area,Plumbing and water,,no,teacher,
+175,Faculty room AC,AC in the faculty area is not working,Faculty Area,Electrical,,no,teacher,
+176,Faculty room chairs,Two chairs in the faculty area are broken,Faculty Area,Furniture,,no,teacher,
+177,Faculty room cleaning,The faculty area is not cleaned in the morning,Faculty Area,Cleaning,,no,teacher,
+178,Faculty printer,The printer in the faculty area is not connected to the network,Faculty Area,IT,,no,teacher,
+179,Faculty projector remote,The projector remote is missing in the faculty meeting room,Faculty Area,IT,,no,teacher,
+180,Admin AC,AC in the admin waiting area is off and it is very hot,Admin Area,Electrical,,no,student,
+181,Admin chairs,Chairs in the admin waiting area are broken,Admin Area,Furniture,,no,student,
+182,Admin staff not available,Admin office staff is not available after 1 pm during working hours,Admin Area,Other,,no,student,
+183,Fee challan printer,Challan printer in the admin area is not working,Admin Area,IT,,no,student,
+184,Long line at admin,There is only one counter open at the admin area and the line is very long,Admin Area,Other,,no,student,
+185,Girls common room fan,Fan in the girls common room is not working,Girls Common Room,Electrical,,no,student,
+186,Girls common room dirty,The girls common room is not cleaned and there is trash on the floor,Girls Common Room,Cleaning,,no,student,
+187,Girls common room wifi,There is no WiFi signal in the girls common room,Girls Common Room,IT,,no,student,
+188,Girls common room water,The water cooler in the girls common room is empty,Girls Common Room,Plumbing and water,,no,student,
+189,Girls common room table,The table in the girls common room is broken,Girls Common Room,Furniture,,no,student,table_girls_common.jpg
+190,Boys common room dirty,The boys common room is very dirty and nobody cleans it,Boys Common Room,Cleaning,,no,student,
+191,Boys common room fan,Two fans in the boys common room are not working,Boys Common Room,Electrical,,no,student,
+192,Boys common room wifi,WiFi does not reach the boys common room,Boys Common Room,IT,,no,student,
+193,Boys common room table,The table tennis table in the boys common room is broken,Boys Common Room,Furniture,,no,student,
+194,Boys common room light,The light in the boys common room keeps flickering,Boys Common Room,Electrical,,no,student,
+195,Boys washroom light,The light in the boys washroom is not working,Boys Washroom,Electrical,,no,student,
+196,Girls washroom light,The light in the girls washroom is not working,Girls Washroom,Electrical,,no,student,
+197,Boys washroom door,The door of the boys washroom does not close properly,Boys Washroom,Furniture,,no,student,
+198,Girls washroom dustbin,Dustbin in the girls washroom is full and not emptied,Girls Washroom,Cleaning,,no,student,
+199,Boys washroom dustbin,The dustbin in the boys washroom is overflowing,Boys Washroom,Cleaning,,no,student,
+200,Lab1 chairs,Chairs in Lab1 are old and the wheels are broken,Lab1,Furniture,,no,student,
+201,Lab2 AC,AC in Lab2 is not cooling and the computers are heating up,Lab2,Electrical,,no,student,
+202,Lab3 projector,The projector in Lab3 is not working,Lab3,IT,,no,teacher,
+203,Lab5 dirty,Lab5 is dusty and the keyboards are dirty,Lab5,Cleaning,,no,student,
+204,Lab6 fan,Fans in Lab6 are very slow and noisy,Lab6,Electrical,,no,student,
+205,Lab7 computers,Computers in Lab7 restart on their own,Lab7,IT,,no,student,
+206,Lab8 internet,No internet in Lab8,Lab8,IT,,no,student,
+207,Lab9 door,The door of Lab9 does not lock properly,Lab9,Other,,no,student,
+208,Lab10 projector,The projector in Lab10 is too dim to read anything,Lab10,IT,,no,teacher,
+209,Lab10 cleaning,The floor of Lab10 is dirty after the practical,Lab10,Cleaning,,no,student,
+210,LT2 chairs,Many chairs in LT2 have no writing arm,LT2,Furniture,,no,student,
+211,LT4 dirty,LT4 is not cleaned after the evening class,LT4,Cleaning,,no,student,
+212,LT6 mic,The mic in LT6 is not working and the back rows cannot hear,LT6,IT,,no,student,
+213,LT7 AC,AC of LT7 is making a loud noise,LT7,Electrical,,no,student,
+214,LT9 light,Lights in LT9 are flickering,LT9,Electrical,,no,student,
+215,LT11 desks,Desks in LT11 are scratched and uneven,LT11,Furniture,,no,student,
+216,LT12 water,There is a water leak from the ceiling in LT12 when it rains,LT12,Plumbing and water,,no,student,ceiling_leak_lt12.jpg
+217,Parking area ,"parking is very dark in the evening, lights are off",Parking,Other,,no,student,
+218,Mud in Parking,when it rains parking area is very muddy,Parking,Other,,no,student,
+219,wrong parking,Students have parked wrongly,Parking,Other,,no,student,
