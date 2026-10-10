@@ -7,8 +7,9 @@ import logging
 import random
 import sqlite3
 
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
+from auth import is_admin
 from db import get_active_complaints_by_building, insert_complaint
 from forms import (
     ALLOWED_BUILDINGS,
@@ -85,13 +86,20 @@ def _save_complaint(clean_data: dict, urgency: str, safety_flag: int) -> str:
 
 @submit_bp.route("/submit", methods=["GET"])
 def submit_form():
-    """Render the empty complaint form."""
+    """Render the empty complaint form. Admins are redirected to their triage dashboard."""
+    if is_admin():
+        flash("Administrators manage issues via the Staff Dashboard and cannot submit student reports.", "info")
+        return redirect(url_for("staff.staff_dashboard"))
     return _render_form()
 
 
 @submit_bp.route("/submit", methods=["POST"])
 def submit_complaint():
     """Validate, safety-scan, store, then redirect to the tracking receipt."""
+    if is_admin():
+        flash("Administrators cannot submit maintenance reports.", "warning")
+        return redirect(url_for("staff.staff_dashboard"))
+
     # Handle optional image file upload or passed filename
     uploaded_image_filename = None
     if "image" in request.files:

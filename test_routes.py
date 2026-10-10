@@ -216,5 +216,22 @@ class RouteTests(unittest.TestCase):
         self.assertIn(b"Safety Hazard", page)
 
 
+    def test_admin_cannot_access_submit_form(self):
+        admin_client = app.test_client()
+        with admin_client.session_transaction() as sess:
+            sess["is_admin"] = True
+        response = admin_client.get("/submit")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/staff", response.location)
+
+    def test_admin_cannot_post_submit(self):
+        admin_client = app.test_client()
+        with admin_client.session_transaction() as sess:
+            sess["is_admin"] = True
+        response = admin_client.post("/submit", data=VALID_FORM)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/staff", response.location)
+
+
 if __name__ == "__main__":
     unittest.main()

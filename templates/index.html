@@ -18,10 +18,12 @@
                     When 15 students report the same broken AC unit, maintenance staff shouldn't drown in 15 separate tickets. CampusFix AI groups duplicates, escalates safety hazards, and keeps students updated.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
+                    {% if not session.get('is_admin') %}
                     <a href="{{ url_for('submit.submit_form') }}" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm">
                         <i class="bi bi-plus-circle me-1"></i> Report an Issue
                     </a>
-                    <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
+                    {% endif %}
+                    <a href="{{ url_for('staff.staff_dashboard') }}" class="btn {% if session.get('is_admin') %}btn-primary{% else %}btn-outline-secondary{% endif %} btn-lg px-4 rounded-pill">
                         <i class="bi bi-kanban me-1" aria-hidden="true"></i> Staff Dashboard
                     </a>
                 </div>

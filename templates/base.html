@@ -22,7 +22,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    {% if session.get('is_admin') %}
+                    {% set public_items = [("index", "Home", "bi-house")] %}
+                    {% else %}
                     {% set public_items = [("index", "Home", "bi-house"), ("submit.submit_form", "Report Issue", "bi-plus-circle")] %}
+                    {% endif %}
                     {% for endpoint, label, icon in public_items %}
                     <li class="nav-item">
                         <a class="nav-link {{ 'active' if request.endpoint == endpoint else 'text-white-50' }}" href="{{ url_for(endpoint) }}" {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>
