@@ -1,5 +1,10 @@
-# CampusFix AI - Milestone 1 Requirements
-# Core web framework
+# CampusFix AI - Requirements
+# Web Framework
 Flask==3.0.3
 Werkzeug==3.0.3
 python-dotenv==1.0.1
+
+# Machine Learning & NLP (CPU)
+scikit-learn==1.5.2
+sentence-transformers==3.1.1
+numpy
