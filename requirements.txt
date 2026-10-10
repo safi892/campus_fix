@@ -4,7 +4,9 @@ Flask==3.0.3
 Werkzeug==3.0.3
 python-dotenv==1.0.1
 
-# Machine Learning & NLP (CPU)
-scikit-learn==1.5.2
+# Machine Learning & NLP (CPU Offline Compatible)
+torch==2.2.2
+numpy==1.26.4
+transformers==4.44.2
 sentence-transformers==3.1.1
-numpy
+scikit-learn==1.5.2
