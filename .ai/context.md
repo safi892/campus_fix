@@ -13,6 +13,7 @@
 | **Database & Schema Queries** | [`.ai/database.md`](file:///Volumes/Data/hackthon/.ai/database.md) | Exact SQLite DDL, parameterized queries, soft-clustering schema (`parent_id`). |
 | **AI / ML & Duplicate Logic** | [`.ai/ml_pipeline.md`](file:///Volumes/Data/hackthon/.ai/ml_pipeline.md) | MiniLM CPU inference, TF-IDF fallback code, safety regex keywords, similarity cutoff. |
 | **Routes, URLs & API Contracts** | [`.ai/routes.md`](file:///Volumes/Data/hackthon/.ai/routes.md) | All Flask endpoint signatures, parameters, JSON responses, form fields. |
+| **Security & Safe Coding** | [`.ai/security.md`](file:///Volumes/Data/hackthon/.ai/security.md) | Parameterized SQL, zero-XSS Jinja auto-escaping, input validation, DoS safety. |
 | **Demo Data & Testing Scenarios** | [`.ai/seed_data.md`](file:///Volumes/Data/hackthon/.ai/seed_data.md) | Ready-to-load realistic campus complaints, pre-arranged duplicate clusters. |
 
 ---
