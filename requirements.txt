@@ -5,6 +5,7 @@
 Flask==3.0.3
 Werkzeug==3.0.3
 python-dotenv==1.0.1
+gunicorn==22.0.0
 
 # 2. Machine Learning, NLP & Embeddings (CPU Offline Mode)
 # Note: numpy<2 and transformers<4.45 are strictly pinned for torch 2.2.2 compatibility

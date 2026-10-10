@@ -129,6 +129,39 @@ class RouteTests(unittest.TestCase):
         parent = db.get_complaint_by_reference("CFX-2026-1001")
         self.assertEqual(parent["duplicate_count"], 5)
 
+    # --- dataset categories & fields from CSV ------------------------
+    def test_submit_csv_dataset_fields(self):
+        form_data = {
+            "title": "Water cooler outside Lab2 broken",
+            "description": "The water cooler outside Lab2 is not giving any cold water since morning.",
+            "location": "Lab2",
+            "room": "Beside entrance",
+            "category": "Plumbing and water",
+            "user_type": "teacher",
+        }
+        response = self.client.post("/submit", data=form_data)
+        self.assertEqual(response.status_code, 302)
+        
+        # Follow to tracking receipt
+        page = self.client.get(response.location).data
+        self.assertIn(b"Plumbing and water", page)
+        self.assertIn(b"Lab2", page)
+        self.assertIn(b"Teacher", page)
+
+    def test_submit_it_category_in_lecture_theater(self):
+        form_data = {
+            "title": "Projector displays blue screen in LT3",
+            "description": "Projector in LT3 is not displaying lecture slides properly.",
+            "location": "LT3",
+            "category": "IT",
+            "user_type": "student",
+        }
+        response = self.client.post("/submit", data=form_data)
+        self.assertEqual(response.status_code, 302)
+        page = self.client.get(response.location).data
+        self.assertIn(b"IT", page)
+        self.assertIn(b"LT3", page)
+
 
 if __name__ == "__main__":
     unittest.main()

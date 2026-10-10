@@ -196,10 +196,10 @@ footer {
 /* Safety Pulse Animation */
 @keyframes safety-beacon {
     0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
     }
     50% {
-        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
     }
 }
 
@@ -235,6 +235,10 @@ footer {
     border-color: #1d4ed8;
     color: white;
     box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+}
+
+.btn-check:checked + .btn-outline-primary .text-muted {
+    color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Form Controls */

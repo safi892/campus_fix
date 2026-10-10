@@ -13,14 +13,19 @@ logger = logging.getLogger("campusfix.ml")
 # 1. Deterministic Emergency Keywords (Life Safety First)
 SAFETY_PATTERNS = [
     r"\bspark(s|ing)?\b",
-    r"\bexposed wire(s)?\b",
-    r"\bgas (leak|smell)\b",
+    r"\b(exposed|bare|hanging)\s+wire(s)?\b",
+    r"\bwire\s+hanging\b",
+    r"\bgas\s+(leak|smell)\b",
     r"\bflood(ing|ed)?\b",
     r"\bsmoke\b",
-    r"\bfire hazard\b",
-    r"\bceiling collaps\w*\b",
-    r"\belectric(al)? shock\b",
-    r"\bbroken glass\b"
+    r"\b(caught\s+)?fire(s)?\b(?!\s+(extinguisher|blanket|drill))",
+    r"\bflame(s)?\b",
+    r"\bburning\b",
+    r"\bshort\s+circuit\b",
+    r"\bceiling\s+collaps\w*\b",
+    r"\belectric(al)?\s+shock\b",
+    r"\bbroken\s+glass\b",
+    r"\bwater\s+(near|on)\s+(electric|socket|board)\b",
 ]
 
 def scan_safety_hazard(text: str) -> bool:

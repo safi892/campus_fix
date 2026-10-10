@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Submit Issue - CampusFix AI{% endblock %}
+{% block title %}Submit Maintenance Report - CampusFix AI{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-7">
+        <div class="col-lg-9 col-xl-8">
             <!-- Header -->
-            <div class="text-center mb-5">
-                <h1 class="display-5 fw-bold mb-2">Report a Campus Issue</h1>
+            <div class="text-center mb-4">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-2">
+                    <i class="bi bi-shield-check me-1"></i> Fast Campus Dispatch
+                </span>
+                <h1 class="display-6 fw-bold mb-2">Report a Campus Issue</h1>
                 <p class="text-muted mb-0">
-                    <i class="bi bi-clock me-1"></i> Takes about 45 seconds
+                    Submit maintenance requests for classrooms, labs, washrooms, and facilities. Reports are deduplicated and prioritized in real time.
                 </p>
             </div>
 
             <!-- Error Alert -->
             {% if error %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <strong>Submission Error:</strong> {{ error }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -24,100 +27,113 @@
             {% endif %}
 
             <!-- Submission Form -->
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('submit.submit_complaint') }}" id="complaintForm">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('submit.submit_complaint') }}" id="complaintForm" enctype="multipart/form-data">
                         
-                        <!-- Campus Building -->
+                        <!-- 1. Reported By (User Role) -->
                         <div class="mb-4">
-                            <label for="building" class="form-label fw-semibold">
-                                Campus Building <span class="text-danger">*</span>
+                            <label class="form-label fw-semibold d-block mb-2">
+                                <i class="bi bi-person-badge text-primary me-1"></i> I am reporting as:
                             </label>
-                            <select class="form-select" id="building" name="building" required>
-                                <option value="" selected disabled>Select a building...</option>
-                                {% for building in buildings %}
-                                <option value="{{ building }}" {% if form_data and form_data.building == building %}selected{% endif %}>
-                                    {{ building }}
+                            <div class="btn-group w-100" role="group" aria-label="User Type">
+                                {% for role in user_types %}
+                                <input 
+                                    type="radio" 
+                                    class="btn-check" 
+                                    name="user_type" 
+                                    id="user_type_{{ role.id }}" 
+                                    value="{{ role.id }}" 
+                                    {% if (form_data and form_data.user_type == role.id) or (not form_data and role.id == 'student') %}checked{% endif %}
+                                >
+                                <label class="btn btn-outline-secondary py-2" for="user_type_{{ role.id }}">
+                                    <i class="bi {{ role.icon }} me-1"></i> {{ role.label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- 2. Campus Location -->
+                        <div class="mb-4">
+                            <label for="location" class="form-label fw-semibold">
+                                <i class="bi bi-geo-alt-fill text-primary me-1"></i> Campus Location / Facility <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-lg" id="location" name="location" required>
+                                <option value="" selected disabled>Select location (e.g. LT3, Lab4, Library, Washroom)...</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc }}" {% if form_data and (form_data.location == loc or form_data.building == loc) %}selected{% endif %}>
+                                    {{ loc }}
                                 </option>
                                 {% endfor %}
                             </select>
+                            <input type="hidden" id="building" name="building" value="{% if form_data %}{{ form_data.location or form_data.building }}{% endif %}">
+                            <div class="form-text">Choose the specific lecture hall, lab, common room, or campus area.</div>
                         </div>
 
-                        <!-- Room/Location -->
+                        <!-- 3. Room / Spot Detail (Optional) -->
                         <div class="mb-4">
                             <label for="room" class="form-label fw-semibold">
-                                Room / Location Detail
+                                Specific Spot / Location Details
                             </label>
                             <input 
                                 type="text" 
                                 class="form-control" 
                                 id="room" 
                                 name="room" 
-                                placeholder="e.g., Room 204, 2nd Floor Hallway"
+                                placeholder="e.g., Near front entrance, Desk #14, 2nd floor sink, Window side"
                                 value="{% if form_data %}{{ form_data.room }}{% endif %}"
                                 maxlength="100"
                             >
-                            <div class="form-text">Optional but helps maintenance locate the issue faster</div>
+                            <div class="form-text">Optional detail to help technicians pinpoint the issue quickly.</div>
                         </div>
 
-                        <!-- Category -->
+                        <!-- 4. Category Cards -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-block mb-3">
-                                Issue Category <span class="text-danger">*</span>
+                                <i class="bi bi-tags-fill text-primary me-1"></i> Issue Category <span class="text-danger">*</span>
                             </label>
-                            <div class="row g-3">
-                                {% for category in categories %}
+                            <div class="row g-2 g-md-3">
+                                {% for cat_name, cat_meta in categories.items() %}
                                 <div class="col-6 col-md-4">
                                     <input 
                                         type="radio" 
                                         class="btn-check" 
                                         name="category" 
-                                        id="category-{{ category }}" 
-                                        value="{{ category }}"
-                                        {% if form_data and form_data.category == category %}checked{% endif %}
+                                        id="category-{{ loop.index }}" 
+                                        value="{{ cat_name }}"
+                                        {% if form_data and form_data.category == cat_name %}checked{% endif %}
                                         required
                                     >
-                                    <label class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3" for="category-{{ category }}">
-                                        {% if category == "HVAC" %}
-                                            <i class="bi bi-thermometer-half fs-4 mb-2"></i>
-                                        {% elif category == "Electrical" %}
-                                            <i class="bi bi-lightning-charge fs-4 mb-2"></i>
-                                        {% elif category == "Plumbing" %}
-                                            <i class="bi bi-droplet fs-4 mb-2"></i>
-                                        {% elif category == "Furniture" %}
-                                            <i class="bi bi-inbox fs-4 mb-2"></i>
-                                        {% elif category == "Cleanliness" %}
-                                            <i class="bi bi-spray-can fs-4 mb-2"></i>
-                                        {% elif category == "Safety" %}
-                                            <i class="bi bi-exclamation-triangle fs-4 mb-2"></i>
-                                        {% endif %}
-                                        <small class="fw-semibold">{{ category }}</small>
+                                    <label class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-center rounded-3 category-card" for="category-{{ loop.index }}">
+                                        <i class="bi {{ cat_meta.icon }} fs-3 mb-2"></i>
+                                        <span class="fw-bold text-truncate w-100">{{ cat_name }}</span>
+                                        <small class="text-muted d-none d-md-block mt-1 lh-sm" style="font-size: 0.72rem;">{{ cat_meta.description }}</small>
                                     </label>
                                 </div>
                                 {% endfor %}
                             </div>
                         </div>
 
-                        <!-- Title -->
+                        <!-- 5. Title -->
                         <div class="mb-4">
                             <label for="title" class="form-label fw-semibold">
                                 Issue Title <span class="text-danger">*</span>
                             </label>
                             <input 
                                 type="text" 
-                                class="form-control" 
+                                class="form-control form-control-lg" 
                                 id="title" 
                                 name="title" 
-                                placeholder="Brief summary of the issue"
+                                placeholder="e.g. Water cooler leaking, Projector shows blue screen"
                                 value="{% if form_data %}{{ form_data.title }}{% endif %}"
                                 minlength="5"
                                 maxlength="150"
                                 required
                             >
-                            <div class="form-text">5-150 characters</div>
+                            <div class="form-text">Keep it short and descriptive (5–150 characters).</div>
                         </div>
 
-                        <!-- Description -->
+                        <!-- 6. Detailed Description -->
                         <div class="mb-4">
                             <label for="description" class="form-label fw-semibold">
                                 Detailed Description <span class="text-danger">*</span>
@@ -126,35 +142,50 @@
                                 class="form-control" 
                                 id="description" 
                                 name="description" 
-                                rows="5"
-                                placeholder="Please describe the issue in detail..."
+                                rows="4"
+                                placeholder="Describe what is broken, what symptoms you see, and how long it has been happening..."
                                 minlength="10"
                                 maxlength="2000"
                                 required
                             >{% if form_data %}{{ form_data.description }}{% endif %}</textarea>
-                            <div class="form-text">10-2000 characters. Be specific to help maintenance staff understand the problem.</div>
+                            <div class="form-text">10–2,000 characters. Mention safety risks (sparks, smells, leaks) clearly.</div>
                         </div>
 
-                        <!-- Duplicate Warning Preview -->
-                        <div id="duplicateWarning" class="alert alert-info border-0 d-none mb-4" role="alert">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <i class="bi bi-info-circle-fill fs-4"></i>
+                        <!-- 7. Photo Attachment (Optional) -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label fw-semibold">
+                                <i class="bi bi-camera-fill text-primary me-1"></i> Attach Photo <span class="badge bg-light text-secondary fw-normal">Optional</span>
+                            </label>
+                            <input 
+                                type="file" 
+                                class="form-control" 
+                                id="image" 
+                                name="image" 
+                                accept="image/*"
+                            >
+                            <div class="form-text">Upload a picture of the issue (JPG, PNG, WebP up to 5MB).</div>
+                        </div>
+
+                        <!-- 8. Live Duplicate Warning Preview -->
+                        <div id="duplicateWarning" class="alert alert-warning border-0 d-none mb-4 p-3 rounded-3 shadow-sm" role="alert">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3 text-warning-emphasis">
+                                    <i class="bi bi-exclamation-circle-fill fs-3"></i>
                                 </div>
-                                <div>
-                                    <h6 class="mb-2 fw-bold">Similar Issue Found</h6>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold text-warning-emphasis">Notice: Existing Report Found</h6>
                                     <p class="mb-2 small" id="duplicateMessage"></p>
                                     <p class="mb-0 small text-muted">
-                                        Your report will still be submitted and linked to increase priority.
+                                        <i class="bi bi-arrow-up-circle me-1"></i> Submitting will link your report to elevate priority for faster dispatch.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Submit Button -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg py-3">
-                                <i class="bi bi-send-fill me-2"></i> Submit Report
+                        <div class="d-grid gap-2 pt-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-pill shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i> Submit Maintenance Report
                             </button>
                         </div>
 
@@ -162,11 +193,11 @@
                 </div>
             </div>
 
-            <!-- Help Text -->
+            <!-- Transparency Footer -->
             <div class="text-center mt-4">
-                <small class="text-muted">
-                    <i class="bi bi-shield-check me-1"></i>
-                    All submissions are reviewed by maintenance staff. Emergency safety issues are escalated automatically.
+                <small class="text-muted d-block">
+                    <i class="bi bi-shield-check text-success me-1"></i>
+                    Submissions are deduplicated using AI with staff-in-the-loop verification. Physical emergencies are escalated immediately.
                 </small>
             </div>
 
@@ -177,29 +208,39 @@
 
 {% block scripts %}
 <script>
-// Simple duplicate check (typeahead preview)
+// Dynamic typeahead duplicate check
 let checkTimeout = null;
 
+function syncLocationAndCheck() {
+    const locSelect = document.getElementById('location');
+    const buildingHidden = document.getElementById('building');
+    if (locSelect && buildingHidden) {
+        buildingHidden.value = locSelect.value;
+    }
+    checkDuplicates();
+}
+
 function checkDuplicates() {
-    const building = document.getElementById('building').value;
-    const title = document.getElementById('title').value;
-    const description = document.getElementById('description').value;
+    const location = document.getElementById('location').value;
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
     
-    // Need building and some text
-    if (!building || (title.length + description.length) < 10) {
+    // Minimum text requirement for peek
+    if (!location || (title.length + description.length) < 10) {
         document.getElementById('duplicateWarning').classList.add('d-none');
         return;
     }
     
-    const query = title + ' ' + description;
-    const url = `/api/check-duplicates?building=${encodeURIComponent(building)}&query=${encodeURIComponent(query)}`;
+    const query = (title + ' ' + description).trim();
+    const url = `/api/check-duplicates?location=${encodeURIComponent(location)}&query=${encodeURIComponent(query)}`;
     
     fetch(url)
         .then(response => response.json())
         .then(data => {
             if (data.similar_complaints && data.similar_complaints.length > 0) {
-                const count = data.similar_complaints[0].duplicate_count;
-                const message = `${count} student${count > 1 ? 's' : ''} already reported a similar issue in this building.`;
+                const match = data.similar_complaints[0];
+                const count = match.duplicate_count || 1;
+                const message = `${count} person${count > 1 ? 's' : ''} already reported a similar issue in ${location} ("${match.title}").`;
                 document.getElementById('duplicateMessage').textContent = message;
                 document.getElementById('duplicateWarning').classList.remove('d-none');
             } else {
@@ -207,24 +248,24 @@ function checkDuplicates() {
             }
         })
         .catch(err => {
-            console.error('Duplicate check failed:', err);
+            console.error('Duplicate check error:', err);
         });
 }
 
-// Debounced duplicate checking
+// Event listeners for debounced duplicate checking
 document.getElementById('title').addEventListener('input', () => {
     clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(checkDuplicates, 500);
+    checkTimeout = setTimeout(checkDuplicates, 450);
 });
 
 document.getElementById('description').addEventListener('input', () => {
     clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(checkDuplicates, 500);
+    checkTimeout = setTimeout(checkDuplicates, 450);
 });
 
-document.getElementById('building').addEventListener('change', () => {
+document.getElementById('location').addEventListener('change', () => {
     clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(checkDuplicates, 300);
+    checkTimeout = setTimeout(syncLocationAndCheck, 200);
 });
 </script>
 {% endblock %}

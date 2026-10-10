@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     status TEXT NOT NULL DEFAULT 'Submitted',-- "Submitted", "Under Review", "In Progress", "Resolved"
     parent_id INTEGER DEFAULT NULL,          -- If clustered: points to canonical complaints(id)
     duplicate_count INTEGER NOT NULL DEFAULT 1, -- Number of reports in this cluster
+    ai_reviewed INTEGER NOT NULL DEFAULT 0,  -- 1 = staff chose "Keep Separate"; never re-suggested
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES complaints (id)
@@ -36,6 +37,8 @@ CREATE INDEX IF NOT EXISTS idx_complaints_building ON complaints(building);
 CREATE INDEX IF NOT EXISTS idx_complaints_parent ON complaints(parent_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
 ```
+
+* **Migration**: `ai_reviewed` was added in Milestone 3. `init_db()` runs `_migrate_schema()`, which adds the column via `ALTER TABLE` on older databases. Additive only, never drops data.
 
 ---
 
@@ -70,22 +73,16 @@ cursor.execute("""
 ```
 
 ### D. Soft-Deduplication Merge (NEVER DELETE)
-When staff confirms Complaint B (`child_id`) is a duplicate of Complaint A (`parent_id`):
-```python
-# 1. Link child to parent
-cursor.execute("""
-    UPDATE complaints 
-    SET parent_id = ?, status = 'Under Review', updated_at = CURRENT_TIMESTAMP 
-    WHERE id = ?
-""", (parent_id, child_id))
+When staff confirms Complaint B (`child_id`) is a duplicate of Complaint A (`parent_id`), `db.link_duplicate(child_id, parent_id)` runs in one transaction (pair validated first in `services/triage.py`):
+1. Parent: `duplicate_count + 1`; `Submitted` → `Under Review`.
+2. **Hazard escalation**: if the child has `safety_hazard = 1`, the parent gets `safety_hazard = 1` and `urgency = 'Critical'` (staff only see parents).
+3. Child: `parent_id = parent`, and inherits the parent's (updated) status. Row and reference code are kept.
 
-# 2. Increment parent cluster counter
-cursor.execute("""
-    UPDATE complaints 
-    SET duplicate_count = duplicate_count + 1, updated_at = CURRENT_TIMESTAMP 
-    WHERE id = ?
-""", (parent_id,))
-```
+### D2. Status Update Cascade
+`db.update_complaint_status(id, status)` updates the job **and every linked child** (`WHERE id = ? OR parent_id = ?`), so each student's `/track` page shows real repair progress.
+
+### D3. Keep Separate
+`db.mark_ai_reviewed(id)` sets `ai_reviewed = 1`; `get_unclustered_candidates()` excludes these rows.
 
 ### E. Campus Hotspot Aggregation Query
 ```python

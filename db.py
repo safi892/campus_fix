@@ -15,6 +15,10 @@ logger = logging.getLogger("campusfix.db")
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance", "campusfix.db")
 
 
+class AlreadyLinkedError(Exception):
+    """Raised when a merge targets a report that is no longer standalone."""
+
+
 # ---------------------------------------------------------------------------
 # Connection helpers
 # ---------------------------------------------------------------------------
@@ -99,6 +103,18 @@ def _migrate_schema(conn: sqlite3.Connection) -> None:
         # 1 = staff chose "Keep Separate"; the AI will not suggest this report again.
         conn.execute("ALTER TABLE complaints ADD COLUMN ai_reviewed INTEGER NOT NULL DEFAULT 0")
         logger.info("Migration: added complaints.ai_reviewed")
+    if "location" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN location TEXT")
+        logger.info("Migration: added complaints.location")
+    if "user_type" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN user_type TEXT DEFAULT 'student'")
+        logger.info("Migration: added complaints.user_type")
+    if "image_filename" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN image_filename TEXT")
+        logger.info("Migration: added complaints.image_filename")
+    if "duplicate_group" not in columns:
+        conn.execute("ALTER TABLE complaints ADD COLUMN duplicate_group TEXT")
+        logger.info("Migration: added complaints.duplicate_group")
 
 
 def reset_database() -> None:
@@ -117,19 +133,29 @@ def insert_complaint(
     title: str,
     description: str,
     building: str,
-    room: Optional[str],
-    category: str,
+    room: Optional[str] = None,
+    category: str = "Other",
     urgency: str = "Normal",
     safety_hazard: int = 0,
+    user_type: str = "student",
+    image_filename: Optional[str] = None,
+    duplicate_group: Optional[str] = None,
+    location: Optional[str] = None,
 ) -> int:
     """Insert a new standalone complaint and return its id."""
+    resolved_loc = location or building
     with db_transaction() as conn:
         cursor = conn.execute("""
             INSERT INTO complaints (
                 reference_code, title, description, building, room,
-                category, urgency, safety_hazard, status, duplicate_count
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Submitted', 1)
-        """, (reference_code, title, description, building, room, category, urgency, safety_hazard))
+                category, urgency, safety_hazard, status, duplicate_count,
+                location, user_type, image_filename, duplicate_group
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Submitted', 1, ?, ?, ?, ?)
+        """, (
+            reference_code, title, description, resolved_loc, room,
+            category, urgency, safety_hazard,
+            resolved_loc, user_type, image_filename, duplicate_group
+        ))
         return cursor.lastrowid
 
 
@@ -209,8 +235,8 @@ def get_unclustered_candidates(building: str) -> list[dict]:
           AND duplicate_count = 1
           AND ai_reviewed = 0
           AND status != 'Resolved'
-        ORDER BY created_at ASC, id ASC
-    """, (building,))
+        ORDER BY id ASC
+    """, (building,))  # id order matches the "older parent" rule in services/triage.py
 
 
 def update_complaint_status(complaint_id: int, new_status: str) -> bool:
@@ -234,14 +260,25 @@ def link_duplicate(child_id: int, parent_id: int) -> int:
     - A submitted parent moves to 'Under Review' (it has now been triaged).
     - The child inherits the parent's status so its tracker shows real progress.
     - A safety hazard on the child escalates the parent, because staff only see parents.
-    Callers are responsible for validating the pair (see services/triage.py).
+    Business validation lives in services/triage.py. As a last line of defence, the
+    child is only linked if it is still standalone, all inside one transaction, so
+    two simultaneous merges can never double-count. Raises AlreadyLinkedError otherwise.
     """
     with db_transaction() as conn:
-        child = conn.execute(
-            "SELECT safety_hazard FROM complaints WHERE id = ?", (child_id,)
-        ).fetchone()
-        child_hazard = child["safety_hazard"] if child else 0
+        # 1. Claim the child atomically (only if still standalone).
+        cursor = conn.execute("""
+            UPDATE complaints
+            SET parent_id = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND parent_id IS NULL AND duplicate_count = 1
+        """, (parent_id, child_id))
+        if cursor.rowcount == 0:
+            raise AlreadyLinkedError(f"Complaint {child_id} is not a standalone report")
 
+        child_hazard = conn.execute(
+            "SELECT safety_hazard FROM complaints WHERE id = ?", (child_id,)
+        ).fetchone()["safety_hazard"]
+
+        # 2. Grow the parent cluster and escalate safety if needed.
         conn.execute("""
             UPDATE complaints
             SET duplicate_count = duplicate_count + 1,
@@ -252,13 +289,12 @@ def link_duplicate(child_id: int, parent_id: int) -> int:
             WHERE id = ?
         """, (child_hazard, child_hazard, parent_id))
 
+        # 3. Child mirrors the parent's (possibly just-updated) status.
         conn.execute("""
             UPDATE complaints
-            SET parent_id = ?,
-                status = (SELECT status FROM complaints WHERE id = ?),
-                updated_at = CURRENT_TIMESTAMP
+            SET status = (SELECT status FROM complaints WHERE id = ?)
             WHERE id = ?
-        """, (parent_id, parent_id, child_id))
+        """, (parent_id, child_id))
 
         row = conn.execute(
             "SELECT duplicate_count FROM complaints WHERE id = ?", (parent_id,)

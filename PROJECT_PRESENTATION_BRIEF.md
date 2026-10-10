@@ -95,7 +95,15 @@ When you run `python3 seed.py`, the database is populated with these 5 realistic
   * **Responsible AI**: AI proposes; staff disposes (Human-in-the-loop).
 * **Visual**: Architecture block diagram showing the multi-tier fallback pipeline.
 
-### Slide 6: Measurable Operational Impact
+### Slide 5B: Honest Model Evaluation & Failure Cases (Judges' Favorite)
+* **Tested on 61 Ground-Truth Labeled Reports** (`campus_complaints_dataset.csv`):
+  * **Precision**: **98.4%** (Only 1 false positive out of 90 evaluated same-building pairs).
+  * **Recall**: **88.4%** (Catches almost 9 in 10 duplicates automatically).
+  * **Overall Accuracy**: **90.0%**.
+* **Honest Failure Analysis**:
+  * *Borderline False Positive*: *"No water in washroom"* vs *"Sink dripping"* (0.653 score) $\rightarrow$ Handled by Human-in-the-Loop staff confirmation.
+  * *False Negative*: *"WiFi down"* vs *"Internet disconnected"* (0.579 score) $\rightarrow$ Handled safely by creating an independent ticket (zero loss).
+* **Script**: Run `python3 evaluate_dataset.py` in the terminal to demonstrate live to judges.
 * **Concrete Numbers (From Our Testbed)**:
   * **68% Workload Reduction**: 16 raw student reports consolidated into 5 actionable repair jobs.
   * **Zero Lost Tracking**: 100% of student reference codes remain valid even after merging.

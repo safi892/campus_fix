@@ -304,11 +304,83 @@ def seed_demo_data():
     print("   2. Track issues using reference codes above")
     print("   3. Test submission form at: http://127.0.0.1:5001/submit")
     print()
-    
+
+
+def seed_from_csv(csv_path: str = "campus_complaints_dataset.csv") -> None:
+    """
+    Seeds database from the complete campus_complaints_dataset.csv file (219 complaints).
+    Groups complaints matching duplicate_group into clusters.
+    """
+    import csv
+    import os
+    if not os.path.isabs(csv_path):
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), csv_path)
+
+    print("=" * 70)
+    print("CampusFix AI — Seeding Database from CSV Dataset")
+    print(f"Source: {csv_path}")
+    print("=" * 70)
+
+    reset_database()
+    groups: dict[str, int] = {}
+    count = 0
+
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            is_safety = 1 if row.get("is_safety", "").strip().lower() == "yes" else 0
+            urgency = "Critical" if is_safety else "Normal"
+            dup_group = row.get("duplicate_group", "").strip() or None
+            user_type = row.get("user_type", "").strip().lower() or "student"
+            image_fn = row.get("image_filename", "").strip() or None
+            ref_code = f"CFX-2026-{1000 + int(row['id'])}"
+            loc = row.get("location", "").strip()
+
+            if dup_group and dup_group in groups:
+                parent_id = groups[dup_group]
+                child_id = insert_complaint(
+                    reference_code=ref_code,
+                    title=row["title"].strip(),
+                    description=row["description"].strip(),
+                    building=loc,
+                    room=None,
+                    category=row["category"].strip(),
+                    urgency=urgency,
+                    safety_hazard=is_safety,
+                    user_type=user_type,
+                    image_filename=image_fn,
+                    duplicate_group=dup_group,
+                    location=loc,
+                )
+                link_duplicate(child_id, parent_id)
+            else:
+                parent_id = insert_complaint(
+                    reference_code=ref_code,
+                    title=row["title"].strip(),
+                    description=row["description"].strip(),
+                    building=loc,
+                    room=None,
+                    category=row["category"].strip(),
+                    urgency=urgency,
+                    safety_hazard=is_safety,
+                    user_type=user_type,
+                    image_filename=image_fn,
+                    duplicate_group=dup_group,
+                    location=loc,
+                )
+                if dup_group:
+                    groups[dup_group] = parent_id
+            count += 1
+
+    print(f"✅ Successfully seeded {count} complaints from CSV into database ({len(groups)} clusters).")
+
 
 if __name__ == "__main__":
     try:
-        seed_demo_data()
+        if "--csv" in sys.argv:
+            seed_from_csv()
+        else:
+            seed_demo_data()
         sys.exit(0)
     except Exception as e:
         print(f"\n❌ ERROR: Seed script failed: {e}", file=sys.stderr)

@@ -6,3 +6,5 @@ instance/
 .env
 .DS_Store
 models/
+static/uploads/*
+!static/uploads/.gitkeep

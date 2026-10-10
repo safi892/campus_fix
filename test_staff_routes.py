@@ -210,6 +210,19 @@ class StatusUpdateTests(StaffTestCase):
         response = self._post_json(self.URL, [1, "Resolved"])
         self.assertEqual(response.status_code, 400)
 
+    def test_non_string_status_400(self):
+        """Unhashable values must be rejected, not crash with a 500."""
+        for bad in (["Resolved"], {"s": 1}, 5, None):
+            with self.subTest(status=bad):
+                response = self._post_json(self.URL, {"id": self._id(AC_PARENT_REF), "status": bad})
+                self.assertEqual(response.status_code, 400)
+
+    def test_child_status_update_rejected_409(self):
+        """A cluster keeps one status: children can't be updated on their own."""
+        response = self._post_json(self.URL, {"id": self._id(AC_CHILD_REF), "status": "Resolved"})
+        self.assertEqual(response.status_code, 409)
+        self.assertNotEqual(db.get_complaint_by_reference(AC_CHILD_REF)["status"], "Resolved")
+
 
 # ---------------------------------------------------------------------------
 # POST /api/cluster/merge
@@ -281,6 +294,22 @@ class ClusterMergeTests(StaffTestCase):
                                               "child_id": child_id})
         self.assertEqual(response.status_code, 400)
         self.assertIsNone(db.get_complaint_by_id(child_id)["parent_id"])
+
+    def test_resolved_parent_rejected_409(self):
+        parent_id = self._id(AC_PARENT_REF)
+        self._post_json("/api/status/update", {"id": parent_id, "status": "Resolved"})
+        response = self._post_json(self.URL, {"parent_id": parent_id,
+                                              "child_id": self._insert_ac_duplicate()})
+        self.assertEqual(response.status_code, 409)
+
+    def test_db_link_is_atomic_against_double_merge(self):
+        """Linking the same child twice at the DB layer fails instead of double-counting."""
+        parent_id = self._id(AC_PARENT_REF)
+        child_id = self._insert_ac_duplicate()
+        self.assertEqual(db.link_duplicate(child_id, parent_id), 6)
+        with self.assertRaises(db.AlreadyLinkedError):
+            db.link_duplicate(child_id, parent_id)
+        self.assertEqual(db.get_complaint_by_id(parent_id)["duplicate_count"], 6)
 
     def test_missing_field_400(self):
         response = self._post_json(self.URL, {"parent_id": self._id(AC_PARENT_REF)})

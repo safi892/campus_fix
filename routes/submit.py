@@ -13,6 +13,9 @@ from db import get_active_complaints_by_building, insert_complaint
 from forms import (
     ALLOWED_BUILDINGS,
     ALLOWED_CATEGORIES,
+    DATASET_CATEGORIES,
+    DATASET_LOCATIONS,
+    USER_TYPES,
     sanitize_complaint_data,
     validate_complaint_submission,
 )
@@ -28,13 +31,15 @@ MAX_REFERENCE_ATTEMPTS = 5
 
 
 def _render_form(error: str = "", form_data: dict | None = None, status: int = 200):
-    """Render the submission form with dropdown options and optional error state."""
+    """Render the submission form with dataset options and optional error state."""
     html = render_template(
         "submit.html",
         error=error,
         form_data=form_data,
-        buildings=sorted(ALLOWED_BUILDINGS),
-        categories=sorted(ALLOWED_CATEGORIES),
+        locations=DATASET_LOCATIONS,
+        buildings=DATASET_LOCATIONS,  # backward compatibility alias
+        categories=DATASET_CATEGORIES,
+        user_types=USER_TYPES,
     )
     return html, status
 
@@ -61,6 +66,9 @@ def _save_complaint(clean_data: dict, urgency: str, safety_flag: int) -> str:
                 category=clean_data["category"],
                 urgency=urgency,
                 safety_hazard=safety_flag,
+                user_type=clean_data.get("user_type", "student"),
+                image_filename=clean_data.get("image_filename"),
+                location=clean_data.get("location"),
             )
             return reference_code
         except sqlite3.IntegrityError:
@@ -77,9 +85,32 @@ def submit_form():
 @submit_bp.route("/submit", methods=["POST"])
 def submit_complaint():
     """Validate, safety-scan, store, then redirect to the tracking receipt."""
+    # Handle optional image file upload or passed filename
+    uploaded_image_filename = None
+    if "image" in request.files:
+        file = request.files["image"]
+        if file and file.filename:
+            import os
+            from werkzeug.utils import secure_filename
+            filename = secure_filename(file.filename)
+            if filename:
+                upload_dir = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "static", "uploads"
+                )
+                os.makedirs(upload_dir, exist_ok=True)
+                file.save(os.path.join(upload_dir, filename))
+                uploaded_image_filename = filename
+
     form_data = {
-        field: request.form.get(field, "")
-        for field in ("title", "description", "category", "building", "room")
+        "title": request.form.get("title", ""),
+        "description": request.form.get("description", ""),
+        "category": request.form.get("category", ""),
+        "location": request.form.get("location", "") or request.form.get("building", ""),
+        "building": request.form.get("location", "") or request.form.get("building", ""),
+        "room": request.form.get("room", ""),
+        "user_type": request.form.get("user_type", "student"),
+        "image_filename": uploaded_image_filename or request.form.get("image_filename", ""),
     }
 
     is_valid, error_message = validate_complaint_submission(form_data)
@@ -107,21 +138,21 @@ def submit_complaint():
 @submit_bp.route("/api/check-duplicates", methods=["GET"])
 def check_duplicates_api():
     """
-    Typeahead peek: top similar active complaints in the same building.
-    Query params: building, query.
+    Typeahead peek: top similar active complaints in the same location.
+    Query params: location (or building), query.
     """
-    building = request.args.get("building", "").strip()
+    location = (request.args.get("location") or request.args.get("building") or "").strip()
     query_text = request.args.get("query", "").strip()
 
-    if building not in ALLOWED_BUILDINGS:
-        return jsonify({"error": "Invalid building"}), 400
+    if location not in ALLOWED_BUILDINGS:
+        return jsonify({"error": "Invalid location"}), 400
 
     if len(query_text) < MIN_PEEK_QUERY_LENGTH:
         return jsonify({"similar_complaints": []})
 
     try:
-        existing = get_active_complaints_by_building(building)
-        # Only canonical (parent) reports are shown to students.
+        existing = get_active_complaints_by_building(location)
+        # Only canonical (parent) reports are shown to reporters.
         existing = [c for c in existing if c["parent_id"] is None]
         matches = find_candidate_duplicates(query_text, "", existing)
     except Exception:

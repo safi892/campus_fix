@@ -14,9 +14,9 @@
 | `POST` | `/submit` | Process report & generate tracking code | Redirect to `/track/<reference_code>` |
 | `GET` | `/track/<reference_code>` | Student real-time tracking receipt | HTML (`track.html`) |
 | `GET` | `/staff` | Staff triage board & AI cluster review | HTML (`staff.html`) |
-| `POST` | `/api/cluster/merge` | Staff confirms duplicate merge | JSON `{ success: true, ... }` |
-| `POST` | `/api/cluster/dismiss` | Staff marks report as distinct | JSON `{ success: true, ... }` |
-| `POST` | `/api/status/update` | Update complaint status (In Progress/Resolved) | JSON `{ success: true, ... }` |
+| `POST` | `/api/cluster/merge` | Staff confirms duplicate merge | JSON `{ success, parent_id, child_id, new_count, message }` |
+| `POST` | `/api/cluster/dismiss` | Staff marks report as distinct | JSON `{ success }` |
+| `POST` | `/api/status/update` | Update complaint status (cascades to linked reports) | JSON `{ success, id, status }` |
 | `GET` | `/api/check-duplicates` | Live typeahead duplicate peek for `/submit` | JSON `[{ id, title, count }, ...]` |
 | `GET` | `/analytics` | Campus problem hotspots & efficiency chart | HTML (`analytics.html`) |
 
@@ -53,29 +53,36 @@
   }
   ```
 
+### Staff JSON API — common rules
+* **No authentication by design** (hackathon demo): `/staff`, `/analytics` and the `/api/*` staff endpoints are open.
+* Requests **must** send `Content-Type: application/json` with a JSON object body; anything else → `400`. (A cross-site HTML form cannot send this content type.)
+* Ids must be positive integers (booleans and strings rejected).
+* Errors: `{ "success": false, "error": "..." }` with `400` (bad input), `404` (not found), `409` (conflict, e.g. already linked).
+
 ### `POST /api/cluster/merge` (JSON)
-* **Body**:
-  ```json
-  {
-    "parent_id": 4,
-    "child_id": 19
-  }
-  ```
+* **Body**: `{ "parent_id": 4, "child_id": 19 }`
+* **Validation** (`services/triage.py`): not self, both exist, parent is canonical, child not already linked and not a cluster itself, same building.
 * **Response**:
   ```json
   {
     "success": true,
-    "message": "Report #19 successfully linked to cluster #4.",
-    "new_cluster_count": 6
+    "parent_id": 4,
+    "child_id": 19,
+    "new_count": 6,
+    "message": "Report #19 linked to cluster #4."
   }
   ```
 
+### `POST /api/cluster/dismiss` (JSON)
+* **Body**: `{ "complaint_id": 19 }`
+* **Behavior**: sets `ai_reviewed = 1` so the report is never suggested again.
+* **Response**: `{ "success": true }`
+
 ### `POST /api/status/update` (JSON)
-* **Body**:
-  ```json
-  {
-    "id": 4,
-    "status": "In Progress"
-  }
-  ```
+* **Body**: `{ "id": 4, "status": "In Progress" }`
 * **Valid Status Values**: `"Submitted" | "Under Review" | "In Progress" | "Resolved"`
+* **Behavior**: cascades to every report linked to the job.
+* **Response**: `{ "success": true, "id": 4, "status": "In Progress" }`
+
+### `GET /staff?building=&category=&status=`
+* Filters are allowlisted; unknown values are ignored (no filter). Without `status`, resolved jobs are hidden.

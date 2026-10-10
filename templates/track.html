@@ -94,10 +94,10 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <div class="d-flex align-items-start">
-                                    <i class="bi bi-building text-primary me-2 fs-5"></i>
+                                    <i class="bi bi-geo-alt-fill text-primary me-2 fs-5"></i>
                                     <div>
-                                        <small class="text-muted d-block">Building</small>
-                                        <span class="fw-semibold">{{ complaint.building }}</span>
+                                        <small class="text-muted d-block">Location / Facility</small>
+                                        <span class="fw-semibold">{{ complaint.location or complaint.building }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -105,9 +105,9 @@
                             {% if complaint.room %}
                             <div class="col-md-6">
                                 <div class="d-flex align-items-start">
-                                    <i class="bi bi-geo-alt text-primary me-2 fs-5"></i>
+                                    <i class="bi bi-pin-map text-primary me-2 fs-5"></i>
                                     <div>
-                                        <small class="text-muted d-block">Location</small>
+                                        <small class="text-muted d-block">Specific Spot</small>
                                         <span class="fw-semibold">{{ complaint.room }}</span>
                                     </div>
                                 </div>
@@ -116,10 +116,20 @@
                             
                             <div class="col-md-6">
                                 <div class="d-flex align-items-start">
-                                    <i class="bi bi-tag text-primary me-2 fs-5"></i>
+                                    <i class="bi bi-tag-fill text-primary me-2 fs-5"></i>
                                     <div>
                                         <small class="text-muted d-block">Category</small>
                                         <span class="fw-semibold">{{ complaint.category }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-person-badge text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Reported By</small>
+                                        <span class="fw-semibold text-capitalize">{{ (complaint.user_type or 'Student') | capitalize }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -139,6 +149,21 @@
                             <h6 class="fw-semibold mb-2">{{ complaint.title }}</h6>
                             <p class="text-muted mb-0">{{ complaint.description }}</p>
                         </div>
+
+                        {% if complaint.image_filename %}
+                        <div class="mt-3 p-3 bg-light rounded-3 border">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-image text-primary me-2"></i>
+                                <small class="fw-semibold text-muted">Attached Photo Reference:</small>
+                                <span class="badge bg-secondary ms-2">{{ complaint.image_filename }}</span>
+                            </div>
+                            <img src="{{ url_for('static', filename='uploads/' + complaint.image_filename) }}" 
+                                 alt="Complaint photo" 
+                                 class="img-fluid rounded border shadow-sm" 
+                                 style="max-height: 240px; object-fit: contain;"
+                                 onerror="this.style.display='none'">
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Volume Signal -->

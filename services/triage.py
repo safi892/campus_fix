@@ -110,6 +110,8 @@ def merge_into_cluster(parent_id: int, child_id: int) -> int:
 
     if parent["parent_id"] is not None:
         raise TriageError("Target report is itself a duplicate; merge into its parent instead.", 409)
+    if parent["status"] == "Resolved":
+        raise TriageError("Target job is already resolved; it cannot take new reports.", 409)
     if child["parent_id"] is not None:
         raise TriageError("This report is already linked to a cluster.", 409)
     if child["duplicate_count"] > 1:
@@ -117,7 +119,24 @@ def merge_into_cluster(parent_id: int, child_id: int) -> int:
     if parent["building"] != child["building"]:
         raise TriageError("Only reports in the same building can be merged.")
 
-    return db.link_duplicate(child_id, parent_id)
+    try:
+        return db.link_duplicate(child_id, parent_id)
+    except db.AlreadyLinkedError:
+        # Another staff member merged it a moment ago.
+        raise TriageError("This report is already linked to a cluster.", 409)
+
+
+def update_job_status(complaint_id: int, status: str) -> None:
+    """
+    Change a job's status (cascades to its linked reports in db.py).
+    Children are rejected so a cluster can never be split across statuses.
+    """
+    complaint = db.get_complaint_by_id(complaint_id)
+    if complaint is None:
+        raise TriageError("Report not found.", status_code=404)
+    if complaint["parent_id"] is not None:
+        raise TriageError("This report is part of a cluster; update the parent job instead.", 409)
+    db.update_complaint_status(complaint_id, status)
 
 
 def keep_separate(complaint_id: int) -> None:

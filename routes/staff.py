@@ -109,11 +109,10 @@ def update_status():
     body = _json_body()
     complaint_id = _required_id(body, "id")
     status = body.get("status")
-    if status not in ALLOWED_STATUSES:
+    if not isinstance(status, str) or status not in ALLOWED_STATUSES:
         raise triage.TriageError(f"'status' must be one of: {', '.join(STATUS_FLOW)}.")
 
-    if not db.update_complaint_status(complaint_id, status):
-        raise triage.TriageError("Report not found.", status_code=404)
+    triage.update_job_status(complaint_id, status)
 
     logger.info("Status of job %d set to %s", complaint_id, status)
     return jsonify({"success": True, "id": complaint_id, "status": status})

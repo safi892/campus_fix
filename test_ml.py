@@ -12,6 +12,10 @@ def test_ml_pipeline():
     test_cases = [
         ("The electrical outlet is sparking and smells like smoke", True),
         ("Water flooding from the second floor bathroom", True),
+        ("fire here", True),
+        ("The dustbin caught fire from a cigarette", True),
+        ("Short circuit in lab 10", True),
+        ("Fire extinguisher in library is expired", False),
         ("The chair in lecture hall 3 has a broken leg", False),
         ("Whiteboard marker is dried out", False),
     ]
