@@ -23,6 +23,10 @@ ALLOWED_BUILDINGS = {
     "Residential Hall West"
 }
 
+# Complaint lifecycle, in workflow order (used for dropdowns and validation)
+STATUS_FLOW = ("Submitted", "Under Review", "In Progress", "Resolved")
+ALLOWED_STATUSES = set(STATUS_FLOW)
+
 # Input length constraints (DoS protection)
 MIN_TITLE_LENGTH = 5
 MAX_TITLE_LENGTH = 150

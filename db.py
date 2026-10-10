@@ -1,26 +1,25 @@
 """
 CampusFix AI — Database Layer
-Provides clean abstraction over SQLite with connection pooling and schema management.
+All SQL lives here. Every query is parameterized (`?`). Records are never deleted:
+duplicates are linked with `parent_id` and counted with `duplicate_count`.
 """
 
-import sqlite3
-import os
 import logging
+import os
+import sqlite3
 from contextlib import contextmanager
 from typing import Optional
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("campusfix.db")
 
-# Database file location
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance", "campusfix.db")
 
 
+# ---------------------------------------------------------------------------
+# Connection helpers
+# ---------------------------------------------------------------------------
 def get_db_connection() -> sqlite3.Connection:
-    """
-    Creates a database connection with Row factory for dict-like access.
-    Each connection is independent and must be closed by the caller.
-    """
+    """Open a new connection with dict-like rows. Caller must close it."""
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -29,37 +28,43 @@ def get_db_connection() -> sqlite3.Connection:
 
 @contextmanager
 def db_transaction():
-    """
-    Context manager for database transactions.
-    Automatically commits on success or rolls back on exception.
-    
-    Usage:
-        with db_transaction() as conn:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO ...")
-    """
+    """Commit on success, roll back on error, always close."""
     conn = get_db_connection()
     try:
         yield conn
         conn.commit()
-    except Exception as e:
+    except Exception:
         conn.rollback()
-        logger.error("Database transaction failed: %s", e)
+        logger.exception("Database transaction failed")
         raise
     finally:
         conn.close()
 
 
+def _fetch_all(query: str, params: tuple = ()) -> list[dict]:
+    conn = get_db_connection()
+    try:
+        return [dict(row) for row in conn.execute(query, params).fetchall()]
+    finally:
+        conn.close()
+
+
+def _fetch_one(query: str, params: tuple = ()) -> Optional[dict]:
+    conn = get_db_connection()
+    try:
+        row = conn.execute(query, params).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Schema
+# ---------------------------------------------------------------------------
 def init_db() -> None:
-    """
-    Initialize database schema if not exists.
-    Safe to call multiple times (idempotent).
-    """
+    """Create tables and indexes if missing, then apply additive migrations. Idempotent."""
     with db_transaction() as conn:
-        cursor = conn.cursor()
-        
-        # Main complaints table
-        cursor.execute("""
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS complaints (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 reference_code TEXT UNIQUE NOT NULL,
@@ -73,36 +78,40 @@ def init_db() -> None:
                 status TEXT NOT NULL DEFAULT 'Submitted',
                 parent_id INTEGER DEFAULT NULL,
                 duplicate_count INTEGER NOT NULL DEFAULT 1,
+                ai_reviewed INTEGER NOT NULL DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (parent_id) REFERENCES complaints (id)
             )
         """)
-        
-        # Performance indexes
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_complaints_ref 
-            ON complaints(reference_code)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_complaints_building 
-            ON complaints(building)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_complaints_parent 
-            ON complaints(parent_id)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_complaints_status 
-            ON complaints(status)
-        """)
-        
-        logger.info("Database schema initialized successfully at: %s", DB_PATH)
+        _migrate_schema(conn)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_complaints_ref ON complaints(reference_code)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_complaints_building ON complaints(building)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_complaints_parent ON complaints(parent_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status)")
+    logger.info("Database ready at %s", DB_PATH)
 
 
+def _migrate_schema(conn: sqlite3.Connection) -> None:
+    """Add columns introduced after the first release. Never drops data."""
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(complaints)")}
+    if "ai_reviewed" not in columns:
+        # 1 = staff chose "Keep Separate"; the AI will not suggest this report again.
+        conn.execute("ALTER TABLE complaints ADD COLUMN ai_reviewed INTEGER NOT NULL DEFAULT 0")
+        logger.info("Migration: added complaints.ai_reviewed")
+
+
+def reset_database() -> None:
+    """Drop and recreate the schema. Development and seeding only."""
+    with db_transaction() as conn:
+        conn.execute("DROP TABLE IF EXISTS complaints")
+    logger.warning("Database reset: complaints table dropped")
+    init_db()
+
+
+# ---------------------------------------------------------------------------
+# Student flow
+# ---------------------------------------------------------------------------
 def insert_complaint(
     reference_code: str,
     title: str,
@@ -111,135 +120,214 @@ def insert_complaint(
     room: Optional[str],
     category: str,
     urgency: str = "Normal",
-    safety_hazard: int = 0
+    safety_hazard: int = 0,
 ) -> int:
-    """
-    Insert a new complaint and return its ID.
-    Uses parameterized queries to prevent SQL injection.
-    """
+    """Insert a new standalone complaint and return its id."""
     with db_transaction() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
+        cursor = conn.execute("""
             INSERT INTO complaints (
                 reference_code, title, description, building, room,
                 category, urgency, safety_hazard, status, duplicate_count
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Submitted', 1)
         """, (reference_code, title, description, building, room, category, urgency, safety_hazard))
-        
         return cursor.lastrowid
 
 
 def get_complaint_by_reference(reference_code: str) -> Optional[dict]:
-    """
-    Retrieve a single complaint by its reference code.
-    Returns a dict-like Row object or None if not found.
-    """
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT * FROM complaints WHERE reference_code = ?
-        """, (reference_code,))
-        row = cursor.fetchone()
-        return dict(row) if row else None
-    finally:
-        conn.close()
+    return _fetch_one("SELECT * FROM complaints WHERE reference_code = ?", (reference_code,))
 
 
 def get_complaint_by_id(complaint_id: int) -> Optional[dict]:
-    """Retrieve a single complaint by primary key, or None if not found."""
-    conn = get_db_connection()
-    try:
-        row = conn.execute(
-            "SELECT * FROM complaints WHERE id = ?", (complaint_id,)
-        ).fetchone()
-        return dict(row) if row else None
-    finally:
-        conn.close()
+    return _fetch_one("SELECT * FROM complaints WHERE id = ?", (complaint_id,))
 
 
 def get_active_complaints_by_building(building: str) -> list[dict]:
-    """
-    Get all active (non-resolved) complaints in a specific building.
-    Used for duplicate detection.
-    """
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT * FROM complaints 
-            WHERE building = ? AND status != 'Resolved'
-            ORDER BY created_at DESC
-        """, (building,))
-        return [dict(row) for row in cursor.fetchall()]
-    finally:
-        conn.close()
+    """All non-resolved complaints in a building (used by the typeahead peek)."""
+    return _fetch_all("""
+        SELECT * FROM complaints
+        WHERE building = ? AND status != 'Resolved'
+        ORDER BY created_at DESC
+    """, (building,))
 
 
 def get_all_complaints(limit: int = 100) -> list[dict]:
-    """
-    Retrieve recent complaints (for admin/staff views).
-    """
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT * FROM complaints 
-            ORDER BY created_at DESC 
-            LIMIT ?
-        """, (limit,))
-        return [dict(row) for row in cursor.fetchall()]
-    finally:
-        conn.close()
+    return _fetch_all("SELECT * FROM complaints ORDER BY created_at DESC LIMIT ?", (limit,))
 
 
-def update_complaint_status(complaint_id: int, new_status: str) -> None:
+# ---------------------------------------------------------------------------
+# Staff queue & clusters
+# ---------------------------------------------------------------------------
+def get_staff_queue(
+    building_filter: Optional[str] = None,
+    category_filter: Optional[str] = None,
+    status_filter: Optional[str] = None,
+) -> list[dict]:
     """
-    Update complaint status and refresh updated_at timestamp.
+    Canonical jobs (parent_id IS NULL), safety first, then cluster size, then newest.
+    Without a status filter, resolved jobs are hidden so the queue shows open work.
+    """
+    # Only fixed SQL fragments are joined; every user value goes through `params`.
+    conditions = ["parent_id IS NULL"]
+    params: list = []
+
+    if building_filter:
+        conditions.append("building = ?")
+        params.append(building_filter)
+    if category_filter:
+        conditions.append("category = ?")
+        params.append(category_filter)
+    if status_filter:
+        conditions.append("status = ?")
+        params.append(status_filter)
+    else:
+        conditions.append("status != 'Resolved'")
+
+    query = (
+        "SELECT * FROM complaints WHERE " + " AND ".join(conditions) +
+        " ORDER BY safety_hazard DESC, duplicate_count DESC, created_at DESC, id DESC"
+    )
+    return _fetch_all(query, tuple(params))
+
+
+def get_cluster_children(parent_id: int) -> list[dict]:
+    """Individual student reports linked into a cluster, oldest first."""
+    return _fetch_all("""
+        SELECT * FROM complaints WHERE parent_id = ?
+        ORDER BY created_at ASC, id ASC
+    """, (parent_id,))
+
+
+def get_unclustered_candidates(building: str) -> list[dict]:
+    """
+    Standalone, active, not-yet-reviewed reports in a building.
+    These are the reports the AI may propose merging. Oldest first.
+    """
+    return _fetch_all("""
+        SELECT * FROM complaints
+        WHERE building = ?
+          AND parent_id IS NULL
+          AND duplicate_count = 1
+          AND ai_reviewed = 0
+          AND status != 'Resolved'
+        ORDER BY created_at ASC, id ASC
+    """, (building,))
+
+
+def update_complaint_status(complaint_id: int, new_status: str) -> bool:
+    """
+    Set the status of a complaint AND every report linked to it, so each student's
+    tracking page reflects the real repair progress. Returns False if id not found.
     """
     with db_transaction() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE complaints 
-            SET status = ?, updated_at = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        """, (new_status, complaint_id))
+        cursor = conn.execute("""
+            UPDATE complaints
+            SET status = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? OR parent_id = ?
+        """, (new_status, complaint_id, complaint_id))
+        return cursor.rowcount > 0
 
 
-def link_duplicate(child_id: int, parent_id: int) -> None:
+def link_duplicate(child_id: int, parent_id: int) -> int:
     """
-    Mark child_id as a duplicate of parent_id.
-    Increments parent's duplicate_count and updates child's parent_id.
-    NEVER deletes the child record.
-    """
-    with db_transaction() as conn:
-        cursor = conn.cursor()
-        
-        # Link child to parent
-        cursor.execute("""
-            UPDATE complaints 
-            SET parent_id = ?, status = 'Under Review', updated_at = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        """, (parent_id, child_id))
-        
-        # Increment parent's duplicate counter
-        cursor.execute("""
-            UPDATE complaints 
-            SET duplicate_count = duplicate_count + 1, updated_at = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        """, (parent_id,))
-        
-        logger.info("Linked complaint %d as duplicate of %d", child_id, parent_id)
-
-
-def reset_database() -> None:
-    """
-    Drop all tables and reinitialize schema.
-    USE WITH CAUTION: Only for development and seeding.
+    Link child into parent's cluster and return the parent's new duplicate_count.
+    - Never deletes: the child keeps its own row and reference code.
+    - A submitted parent moves to 'Under Review' (it has now been triaged).
+    - The child inherits the parent's status so its tracker shows real progress.
+    - A safety hazard on the child escalates the parent, because staff only see parents.
+    Callers are responsible for validating the pair (see services/triage.py).
     """
     with db_transaction() as conn:
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE IF EXISTS complaints")
-        logger.warning("Database reset: All tables dropped")
-    
-    init_db()
+        child = conn.execute(
+            "SELECT safety_hazard FROM complaints WHERE id = ?", (child_id,)
+        ).fetchone()
+        child_hazard = child["safety_hazard"] if child else 0
+
+        conn.execute("""
+            UPDATE complaints
+            SET duplicate_count = duplicate_count + 1,
+                status = CASE WHEN status = 'Submitted' THEN 'Under Review' ELSE status END,
+                safety_hazard = MAX(safety_hazard, ?),
+                urgency = CASE WHEN ? = 1 THEN 'Critical' ELSE urgency END,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (child_hazard, child_hazard, parent_id))
+
+        conn.execute("""
+            UPDATE complaints
+            SET parent_id = ?,
+                status = (SELECT status FROM complaints WHERE id = ?),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (parent_id, parent_id, child_id))
+
+        row = conn.execute(
+            "SELECT duplicate_count FROM complaints WHERE id = ?", (parent_id,)
+        ).fetchone()
+
+    logger.info("Linked complaint %d into cluster %d", child_id, parent_id)
+    return row["duplicate_count"]
+
+
+def mark_ai_reviewed(complaint_id: int) -> bool:
+    """Record a 'Keep Separate' decision. Returns False if id not found."""
+    with db_transaction() as conn:
+        cursor = conn.execute("""
+            UPDATE complaints
+            SET ai_reviewed = 1, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (complaint_id,))
+        return cursor.rowcount > 0
+
+
+# ---------------------------------------------------------------------------
+# Analytics
+# ---------------------------------------------------------------------------
+def get_hotspot_analytics() -> dict:
+    """Campus-wide consolidation, safety, and building/category load figures."""
+    totals = _fetch_one("""
+        SELECT
+            COUNT(*) AS total_reports,
+            SUM(CASE WHEN parent_id IS NULL THEN 1 ELSE 0 END) AS consolidated_jobs,
+            SUM(safety_hazard) AS safety_hazards_count,
+            SUM(CASE WHEN parent_id IS NULL AND status = 'Resolved' THEN 1 ELSE 0 END) AS resolved_jobs,
+            SUM(CASE WHEN parent_id IS NULL AND status != 'Resolved' AND safety_hazard = 1
+                     THEN 1 ELSE 0 END) AS active_hazard_jobs
+        FROM complaints
+    """) or {}
+
+    # SUM() returns NULL on an empty table, so normalise to 0.
+    total_reports = totals.get("total_reports") or 0
+    consolidated_jobs = totals.get("consolidated_jobs") or 0
+    resolved_jobs = totals.get("resolved_jobs") or 0
+
+    workload_reduction_pct = (
+        round((1 - consolidated_jobs / total_reports) * 100, 1) if total_reports else 0.0
+    )
+
+    building_stats = _fetch_all("""
+        SELECT building,
+               COUNT(*) AS total_reports,
+               SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) AS resolved_reports
+        FROM complaints
+        GROUP BY building
+        ORDER BY total_reports DESC, building ASC
+    """)
+
+    category_stats = _fetch_all("""
+        SELECT category, COUNT(*) AS total_reports
+        FROM complaints
+        GROUP BY category
+        ORDER BY total_reports DESC, category ASC
+    """)
+
+    return {
+        "total_reports": total_reports,
+        "consolidated_jobs": consolidated_jobs,
+        "workload_reduction_pct": workload_reduction_pct,
+        "safety_hazards_count": totals.get("safety_hazards_count") or 0,
+        "active_hazard_jobs": totals.get("active_hazard_jobs") or 0,
+        "resolved_jobs": resolved_jobs,
+        "pending_jobs": consolidated_jobs - resolved_jobs,
+        "building_stats": building_stats,
+        "category_stats": category_stats,
+    }

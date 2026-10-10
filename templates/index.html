@@ -21,8 +21,8 @@
                     <a href="{{ url_for('submit.submit_form') }}" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm">
                         <i class="bi bi-plus-circle me-1"></i> Report an Issue
                     </a>
-                    <a href="{{ url_for('health_check') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill" target="_blank">
-                        <i class="bi bi-heart-pulse me-1"></i> System Health
+                    <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
+                        <i class="bi bi-kanban me-1" aria-hidden="true"></i> Staff Dashboard
                     </a>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                             </span>
                             <div>
                                 <h6 class="mb-0 fw-bold">System Status</h6>
-                                <small class="text-muted">Milestone 1 Online</small>
+                                <small class="text-muted">All services online</small>
                             </div>
                         </div>
                         <span class="badge bg-success px-3 py-2 rounded-pill">Active</span>
@@ -62,7 +62,7 @@
 
                     <div class="alert alert-success border-0 mt-3 mb-0 py-2 small">
                         <i class="bi bi-check-circle-fill me-1"></i>
-                        Milestone 2 Complete: Database, submission & tracking active!
+                        Submission, tracking, staff triage &amp; analytics are live.
                     </div>
                 </div>
             </div>
@@ -153,14 +153,14 @@
                         <div class="d-flex mb-3">
                             <span class="badge bg-success me-3 py-2 px-3 align-self-start">M2</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite (Current)</h6>
+                                <h6 class="mb-0 fw-bold">Complaint Submission &amp; SQLite ✓</h6>
                                 <small class="text-muted">Student complaint form, validation, tracking, and database storage.</small>
                             </div>
                         </div>
                         <div class="d-flex">
-                            <span class="badge bg-secondary me-3 py-2 px-3 align-self-start">M3</span>
+                            <span class="badge bg-success me-3 py-2 px-3 align-self-start">M3</span>
                             <div>
-                                <h6 class="mb-0 fw-bold">AI Duplicate Detection &amp; Staff Dashboard</h6>
+                                <h6 class="mb-0 fw-bold">AI Duplicate Review &amp; Staff Dashboard ✓</h6>
                                 <small class="text-muted">MiniLM similarity clustering, safety alerts, and staff approval interface.</small>
                             </div>
                         </div>

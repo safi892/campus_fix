@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% import "components/ui.html" as ui %}
+
+{% block title %}Staff Dashboard - CampusFix AI{% endblock %}
+
+{% block content %}
+<div class="container py-5" id="staffBoard"
+     data-status-url="{{ url_for('staff.update_status') }}"
+     data-merge-url="{{ url_for('staff.merge_cluster') }}"
+     data-dismiss-url="{{ url_for('staff.dismiss_suggestion') }}">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <h1 class="page-title mb-1">Maintenance Triage Board</h1>
+            <p class="text-muted mb-0">Safety hazards first, then the issues the most students reported.</p>
+        </div>
+        <a href="{{ url_for('staff.analytics_view') }}" class="btn btn-outline-secondary rounded-pill">
+            <i class="bi bi-bar-chart-line me-1" aria-hidden="true"></i> Hotspots &amp; Analytics
+        </a>
+    </div>
+
+    <!-- Counters -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">{{ ui.stat_card("Urgent Safety Hazards", stats.active_hazard_jobs, "bi-exclamation-triangle-fill", "danger") }}</div>
+        <div class="col-md-4">{{ ui.stat_card("Total Student Reports", stats.total_reports, "bi-inboxes-fill", "primary") }}</div>
+        <div class="col-md-4">{{ ui.stat_card("Consolidated Repair Jobs", stats.consolidated_jobs, "bi-collection-fill", "success") }}</div>
+    </div>
+
+    <!-- Filters -->
+    <form method="GET" action="{{ url_for('staff.staff_dashboard') }}" class="card filter-bar mb-5" aria-label="Filter queue">
+        <div class="card-body row g-3 align-items-end">
+            {{ ui.filter_select("building", "Building", buildings, filters.building) }}
+            {{ ui.filter_select("category", "Category", categories, filters.category) }}
+            {{ ui.filter_select("status", "Status", statuses, filters.status) }}
+            <div class="col-sm-6 col-lg-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary rounded-pill flex-grow-1">
+                    <i class="bi bi-funnel me-1" aria-hidden="true"></i> Apply
+                </button>
+                <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-outline-secondary rounded-pill">Clear</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- AI Duplicate Review Deck -->
+    <section class="mb-5" aria-labelledby="reviewDeckTitle">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <h2 id="reviewDeckTitle" class="section-title mb-0">AI Duplicate Review</h2>
+            <span class="badge rounded-pill ai-badge" id="suggestionCount">{{ suggestions | length }} pending</span>
+        </div>
+        <p class="text-muted small mb-3">
+            The AI only proposes matches within the same building. Nothing is merged until you confirm it.
+        </p>
+
+        <div id="suggestionDeck" class="vstack gap-3">
+            {% for s in suggestions %}
+            <article class="card suggestion-card js-suggestion"
+                     data-parent-id="{{ s.parent.id }}" data-child-id="{{ s.candidate.id }}">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        {{ ui.similarity_badge(s.similarity_pct, s.confidence) }}
+                        <small class="text-muted"><i class="bi bi-building me-1" aria-hidden="true"></i>{{ s.candidate.building }}</small>
+                    </div>
+
+                    <div class="row g-3 align-items-stretch">
+                        <div class="col-md">
+                            <div class="compare-panel h-100">
+                                <div class="compare-label">New candidate report</div>
+                                <h3 class="item-title">{{ s.candidate.title }}</h3>
+                                <p class="small text-muted mb-2 text-truncate-3">{{ s.candidate.description }}</p>
+                                <div class="meta-line">
+                                    <span>{{ s.candidate.reference_code }}</span>
+                                    {% if s.candidate.room %}<span>{{ s.candidate.room }}</span>{% endif %}
+                                    <span>{{ s.candidate.created_at | friendly_date }}</span>
+                                </div>
+                                {% if s.candidate.safety_hazard %}<div class="mt-2">{{ ui.safety_badge() }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-auto d-flex align-items-center justify-content-center">
+                            <i class="bi bi-arrow-right-circle compare-arrow" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="col-md">
+                            <div class="compare-panel compare-parent h-100">
+                                <div class="compare-label">Existing canonical report</div>
+                                <h3 class="item-title">{{ s.parent.title }}</h3>
+                                <p class="small text-muted mb-2 text-truncate-3">{{ s.parent.description }}</p>
+                                <div class="meta-line">
+                                    <span>{{ s.parent.reference_code }}</span>
+                                    {% if s.parent.room %}<span>{{ s.parent.room }}</span>{% endif %}
+                                </div>
+                                <div class="mt-2">{{ ui.volume_badge(s.parent.duplicate_count) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill js-dismiss">
+                            <i class="bi bi-x-lg me-1" aria-hidden="true"></i> Keep Separate
+                        </button>
+                        <button type="button" class="btn btn-success rounded-pill js-accept">
+                            <i class="bi bi-check-lg me-1" aria-hidden="true"></i> Accept Merge
+                        </button>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div id="suggestionEmpty" class="empty-state {% if suggestions %}d-none{% endif %}">
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            No pending duplicate suggestions. New student reports are compared automatically.
+        </div>
+    </section>
+
+    <!-- Priority Queue -->
+    <section aria-labelledby="queueTitle">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <h2 id="queueTitle" class="section-title mb-0">Priority Queue</h2>
+            <span class="badge rounded-pill text-bg-light border">{{ queue | length }} jobs</span>
+        </div>
+
+        <div class="vstack gap-3">
+            {% for job in queue %}
+            <article class="card job-card {% if job.safety_hazard %}job-card-hazard{% endif %}" data-job-id="{{ job.id }}">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between gap-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                {{ ui.urgency_badge(job.urgency) }}
+                                {% if job.safety_hazard %}{{ ui.safety_badge() }}{% endif %}
+                                {{ ui.volume_badge(job.duplicate_count) }}
+                            </div>
+                            <h3 class="item-title mb-1">{{ job.title }}</h3>
+                            <div class="meta-line">
+                                <span><i class="bi bi-building me-1" aria-hidden="true"></i>{{ job.building }}</span>
+                                {% if job.room %}<span><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ job.room }}</span>{% endif %}
+                                <span><i class="bi bi-tag me-1" aria-hidden="true"></i>{{ job.category }}</span>
+                                <span><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ job.created_at | friendly_date }}</span>
+                                <a href="{{ url_for('track.track_complaint', reference_code=job.reference_code) }}">{{ job.reference_code }}</a>
+                            </div>
+                        </div>
+
+                        <div class="status-control">
+                            <label for="status-{{ job.id }}" class="form-label small fw-semibold text-muted mb-1">Status</label>
+                            <select id="status-{{ job.id }}" class="form-select form-select-sm js-status-select" data-job-id="{{ job.id }}">
+                                {% for status in statuses %}
+                                <option value="{{ status }}" {% if status == job.status %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if job.children %}
+                    <button class="btn btn-link btn-sm px-0 mt-2 cluster-toggle" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#cluster-{{ job.id }}"
+                            aria-expanded="false" aria-controls="cluster-{{ job.id }}">
+                        <i class="bi bi-chevron-down me-1" aria-hidden="true"></i>
+                        Show {{ job.children | length }} linked student report{{ 's' if job.children | length != 1 }}
+                    </button>
+                    <div class="collapse" id="cluster-{{ job.id }}">
+                        <ul class="list-unstyled cluster-list mt-2 mb-0">
+                            {% for child in job.children %}
+                            <li>
+                                <div class="fw-semibold">{{ child.title }}</div>
+                                <div class="meta-line">
+                                    <a href="{{ url_for('track.track_complaint', reference_code=child.reference_code) }}">{{ child.reference_code }}</a>
+                                    <span>{{ child.created_at | friendly_date }}</span>
+                                    {% if child.safety_hazard %}<span class="text-danger fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>Hazard keywords</span>{% endif %}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox" aria-hidden="true"></i>
+                No jobs match these filters.
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<!-- Feedback toast (aria-live so screen readers hear results) -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="staffToast" class="toast align-items-center border-0" role="status" aria-live="polite" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="staffToastBody"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/staff.js') }}"></script>
+{% endblock %}

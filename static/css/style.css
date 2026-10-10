@@ -263,3 +263,215 @@ footer {
         margin: 0 4px;
     }
 }
+
+/* ==========================================================================
+   Milestone 3 — shared typography, badges, staff board, analytics
+   Colours follow .ai/design.md
+   ========================================================================== */
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #0F172A;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #0F172A;
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #0F172A;
+    margin-bottom: 0.35rem;
+}
+
+.meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #64748B;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Badges ------------------------------------------------------------------ */
+.hazard-badge {
+    background-color: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #DC2626;
+}
+
+.volume-badge { border: 1px solid transparent; font-weight: 600; }
+.volume-single { background-color: #F1F5F9; border-color: #E2E8F0; color: #334155; }
+.volume-medium { background-color: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8; }
+.volume-high   { background-color: #FFFBEB; border-color: #FDE68A; color: #B45309; }
+
+.status-badge { border: 1px solid transparent; font-weight: 600; }
+.status-submitted { background-color: #F1F5F9; border-color: #E2E8F0; color: #334155; }
+.status-review    { background-color: #F5F3FF; border-color: #DDD6FE; color: #6D28D9; }
+.status-progress  { background-color: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8; }
+.status-resolved  { background-color: #ECFDF5; border-color: #A7F3D0; color: #047857; }
+
+.ai-badge {
+    background-color: #F5F3FF;
+    border: 1px solid #DDD6FE;
+    color: #6D28D9;
+    font-weight: 600;
+}
+
+/* Stat cards -------------------------------------------------------------- */
+.stat-card, .filter-bar, .job-card, .suggestion-card {
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+.stat-icon-primary { background-color: #EFF6FF; color: #1D4ED8; }
+.stat-icon-success { background-color: #ECFDF5; color: #059669; }
+.stat-icon-danger  { background-color: #FEF2F2; color: #DC2626; }
+.stat-icon-warning { background-color: #FFFBEB; color: #D97706; }
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #0F172A;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #64748B;
+}
+
+/* Staff queue ------------------------------------------------------------- */
+.job-card { transition: box-shadow 0.2s ease; }
+.job-card:hover {
+    box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+}
+.job-card-hazard { border-left: 4px solid #DC2626; }
+
+.status-control { min-width: 180px; }
+
+.cluster-toggle { text-decoration: none; font-weight: 600; }
+.cluster-toggle[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); }
+.cluster-toggle .bi-chevron-down { display: inline-block; transition: transform 0.2s ease; }
+
+.cluster-list li {
+    padding: 0.75rem 1rem;
+    border-left: 2px solid #BFDBFE;
+    background-color: #F8FAFC;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state {
+    padding: 1.5rem;
+    border: 1px dashed #CBD5E1;
+    border-radius: 14px;
+    text-align: center;
+    color: #64748B;
+    background-color: #FFFFFF;
+}
+.empty-state .bi { display: block; font-size: 1.5rem; margin-bottom: 0.35rem; }
+
+/* AI review deck ---------------------------------------------------------- */
+.suggestion-card {
+    border-left: 4px solid #7C3AED;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.suggestion-card.is-leaving { opacity: 0; transform: translateX(-24px); }
+
+.compare-panel {
+    padding: 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    background-color: #F8FAFC;
+}
+.compare-parent { background-color: #FFFFFF; }
+
+.compare-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #64748B;
+    margin-bottom: 0.4rem;
+}
+
+.compare-arrow { font-size: 1.5rem; color: #7C3AED; }
+
+@keyframes count-pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+.count-pop { display: inline-block; animation: count-pop 0.4s ease; }
+
+/* Analytics --------------------------------------------------------------- */
+.impact-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 14px;
+    background-color: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1E3A8A;
+    font-size: 1.05rem;
+}
+.impact-banner .bi { font-size: 1.75rem; color: #1D4ED8; }
+
+.progress { height: 1.1rem; border-radius: 9999px; }
+.progress-lg { height: 1.5rem; }
+.progress-stacked { height: 1.1rem; border-radius: 9999px; }
+
+.gauge-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #059669;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+/* Accessibility ----------------------------------------------------------- */
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid #1D4ED8;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

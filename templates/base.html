@@ -13,11 +13,18 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation Bar -->
+    {#- Navigation items: (endpoint, label, icon). Add new pages here. -#}
+    {% set nav_items = [
+        ("index", "Home", "bi-house"),
+        ("submit.submit_form", "Report Issue", "bi-plus-circle"),
+        ("staff.staff_dashboard", "Staff Dashboard", "bi-kanban"),
+        ("staff.analytics_view", "Hotspots & Analytics", "bi-bar-chart-line"),
+    ] %}
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <i class="bi bi-tools text-primary me-2 fs-4"></i>
+                <i class="bi bi-tools text-primary me-2 fs-4" aria-hidden="true"></i>
                 <span>CampusFix</span>
                 <span class="brand-badge">AI</span>
             </a>
@@ -26,18 +33,18 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    {% for endpoint, label, icon in nav_items %}
+                    {% set is_active = request.endpoint == endpoint %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('index') }}">Home</a>
+                        <a class="nav-link {{ 'active' if is_active else 'text-white-50' }}"
+                           href="{{ url_for(endpoint) }}" {% if is_active %}aria-current="page"{% endif %}>
+                            <i class="bi {{ icon }} me-1" aria-hidden="true"></i>{{ label }}
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50" href="#features">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50" href="#about">About</a>
-                    </li>
+                    {% endfor %}
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-info btn-sm px-3 rounded-pill" href="{{ url_for('health_check') }}" target="_blank">
-                            <i class="bi bi-activity me-1"></i> Health Check
+                        <a class="btn btn-outline-info btn-sm px-3 rounded-pill" href="{{ url_for('health_check') }}" target="_blank" rel="noopener">
+                            <i class="bi bi-activity me-1" aria-hidden="true"></i> Health
                         </a>
                     </li>
                 </ul>
@@ -45,16 +52,14 @@
         </div>
     </nav>
 
-    <!-- Main Content Block -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="py-4 mt-auto">
         <div class="container text-center">
             <p class="mb-1 fw-medium">CampusFix AI &bull; Intelligent University Maintenance Management</p>
-            <small class="text-muted">Built for Hackathon &bull; Milestone 2: Database, Submission &amp; Tracking Complete</small>
+            <small class="text-muted">Offline AI duplicate clustering &bull; Deterministic safety escalation &bull; Human-in-the-loop review</small>
         </div>
     </footer>
 
